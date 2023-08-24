@@ -2,7 +2,7 @@
 
 {% block navigate %}
  {% for sta in station %}
- <li><a href="http://192.168.35.94:81/{{sta}}">{{sta}}</a></li>
+ <li><a href="http://192.168.35.94:81/{{sta}}/last">{{sta}}</a></li>
  {% endfor %}
  
 {% endblock %}
@@ -16,36 +16,22 @@
         <span class="badge badge-primary"></span>
         <hr>
         <div>
-        <label for="selectStation">Select station:</label>
+
+        <label for="selectStation">Select version:</label>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <select id="selectVersion">
-            {% for sta in flist %}
-            <option>{{sta}}</option>
+            {% for ver in version_list %}
+            <option id="{{ver}}" value="http://192.168.35.94:81/{{chooseSta}}/{{ver}}">{{ver}}</option>
             {% endfor %}
         </select>
-        <script type="text/javascript">
-           
-            $("#selectStation").change(function() {
-              var option = $(this).find('option:selected');
-              window.location.href = option.data("url");
-            });
-            
-        </script>
-        <script type="text/javascript">
-           
-             let selectorSta=document.querySelector("#selectStation")
-                        try {
-                            selectorSta.value="{{chooseSta}}";
-                        } catch(err) {
-                            selectorSta.value="0";
-                        }
-                        
-        </script>
-         
-
-        </div>
+        
+       </div>
         <div>
-            <form>
+            <button onclick="IsSubmit()" class="btn btn-primary">Send</button>
+            <form method="post">
+                <div> 
+                    <button id="submit" type="submit" class="btn btn-primary" style="display:none;">Submit</button>
+                </div>
                 <fieldset>
                 <h4>System</h4>
                 <table width="100%">
@@ -60,13 +46,13 @@
                    <label for="deviceInput">Device Name</label>
                 </td>
                 <td>
-                   <input id="deviceInput" type="text" value={{stat['device_name']}}>
+                   <input id="deviceInput" name="deviceInput" type="text" value={{stat['device_name']}}>
                 </td>
                 <td>
                    <label for="samprateInput">Samprate</label>
                 </td>
                 <td>
-                   <input id="samprateInput" type="text" value={{stat['samprate']}}>
+                   <input id="samprateInput" name="samprateInput"  type="text" value={{stat['samprate']}}>
                </td>
                 </tr>
                 <tr>
@@ -74,13 +60,13 @@
                    <label for="lcdInput">LCD on time</label>
                </td>
                <td>
-                   <input id="lcdInput" type="text" value={{stat['LCD_ON_TIME']}}>
+                   <input id="lcdInput" name="lcdInput" type="text" value={{stat['LCD_ON_TIME']}}>
                 </td>
                 <td>
                    <label for="tempInput">Temp mes int</label>
                 </td>
                 <td>
-                   <input id="tempInput" type="text" value={{stat['TEMP_MES_INT']}}>
+                   <input id="tempInput" name="tempInput" type="text" value={{stat['TEMP_MES_INT']}}>
                  </td>
                </tr>
                <tr> 
@@ -88,33 +74,33 @@
                    <label for="senspowInput">Sens pow</label>
                  </td>
                  <td>
-                   <input id="senspowInput" type="text" value={{stat['SENS_POW']}}>
+                   <input id="senspowInput" name="senspowInput" type="text" value={{stat['SENS_POW']}}>
                  </td>
                  <td>
                    <label for="slowrecInput">Slow rec interval</label>
                  </td>
                  <td>
-                   <input id="slowrecInput" type="text" value={{stat['SLOW_REC_INTERVAL']}}>
+                   <input id="slowrecInput" name="slowrecInput" type="text" value={{stat['SLOW_REC_INTERVAL']}}>
                   </td>
                 <tr>
                  <td>
                      <label for="gainInput">Gain</label>
                  </td>
                  <td>
-                     <input id="gainInput" type="text" value={{stat['GAIN']}}>
+                     <input id="gainInput" name="gainInput" type="text" value={{stat['GAIN']}}>
                  </td>
                  
                  <td>
                      <label for="lenInput">Len</label>
                  </td>
                  <td>
-                     <input id="lenInput" type="text" value={{stat['LEN']}}>
+                     <input id="lenInput" name="lenInput" type="text" value={{stat['LEN']}}>
                  </td>
                </tr>
                <tr>
                 <td>
                      <label for="autoInput">Auto</label>
-                    <input id="autoInput" type="checkbox" style="margin-left:4%;" checked={{stat['AUTO']}}>
+                    <input id="autoInput" name="autoInput" type="checkbox" style="margin-left:4%;" >
                  </td>
                </tr>
            </table>
@@ -125,21 +111,21 @@
           <table>
               <tr>
                  <td><label for="net0Input">Net</label></td>
-                 <td><input id="net0Input" type="text" style="margin-left:4%;" value={{ch0['NET']}}></td>
+                 <td><input id="net0Input" name="net0Input" type="text" style="margin-left:4%;" value={{ch0['NET']}}></td>
                  <td><label for="station0Input" style="margin-left:20%;">Station</label></td>
-                 <td><input id="station0Input" type="text" value={{ch0['STATION']}}></td>
+                 <td><input id="station0Input" name="station0Input" type="text" value={{ch0['STATION']}}></td>
                   <td><label for="loc0Input" style="margin-left:40%;">Loc</label></td>
-                 <td><input id="loc0Input" type="text" style="margin-left:5%;" value={{ch0['LOC']}}></td>
+                 <td><input id="loc0Input" name="loc0Input" type="text" style="margin-left:5%;" value={{ch0['LOC']}}></td>
              </tr>
              <tr>
                   <td><label for="name0Input">Name</label></td>
-                 <td><input id="name0Input" type="text" style="margin-left:4%;" value={{ch0['NAME']}}></td>
+                 <td><input id="name0Input" name="name0Input" type="text" style="margin-left:4%;" value={{ch0['NAME']}}></td>
                   <td><label for="todisk0Input" style="margin-left:40%;" >To disk</label></td>
-                 <td><input id="todisk0Input" type="checkbox" style="margin-left:10%;" checked={{ch0['TO_DISK']}}></td>
+                 <td><input id="todisk0Input" name="todisk0Input" type="checkbox" style="margin-left:10%;" ></td>
                   <td><label for="tonet0Input" style="margin-left:40%;">To net</label></td>
-                 <td><input id="tonet0Input" type="checkbox" style="margin-left:10%;" checked={{ch0['TO_NET']}}></td>
+                 <td><input id="tonet0Input" name="tonet0Input" type="checkbox" style="margin-left:10%;" ></td>
                   <td><label for="todisp0Input" style="margin-left:40%;" >To disp</label></td>
-                 <td><input id="todisp0Input" type="checkbox" style="margin-left:10%;" checked={{ch0['TO_DISP']}}></td>
+                 <td><input id="todisp0Input" name="todisp0Input" type="checkbox" style="margin-left:10%;" ></td>
               </tr>
        
           </table>
@@ -150,21 +136,21 @@
           <table>
               <tr>
                  <td><label for="net1Input">Net</label></td>
-                 <td><input id="net1Input" type="text" style="margin-left:4%;" value={{ch1['NET']}}></td>
+                 <td><input id="net1Input" name="net1Input" type="text" style="margin-left:4%;" value={{ch1['NET']}}></td>
                  <td><label for="station1Input" style="margin-left:20%;">Station</label></td>
-                 <td><input id="station1Input" type="text" value={{ch1['STATION']}}></td>
+                 <td><input id="station1Input" name="station1Input" type="text" value={{ch1['STATION']}}></td>
                   <td><label for="loc1Input" style="margin-left:40%;">Loc</label></td>
-                 <td><input id="loc1Input" type="text" style="margin-left:5%;" value={{ch1['LOC']}}></td>
+                 <td><input id="loc1Input" name="loc1Input" type="text" style="margin-left:5%;" value={{ch1['LOC']}}></td>
              </tr>
              <tr>
                   <td><label for="name1Input">Name</label></td>
-                 <td><input id="name1Input" type="text" style="margin-left:4%;" value={{ch1['NAME']}}></td>
+                 <td><input id="name1Input" name="name1Input" type="text" style="margin-left:4%;" value={{ch1['NAME']}}></td>
                   <td><label for="todisk1Input" style="margin-left:40%;">To disk</label></td>
-                 <td><input id="todisk1Input" type="checkbox" style="margin-left:10%;" checked={{ch1['TO_DISK']}}></td>
+                 <td><input id="todisk1Input" name="todisk1Input" type="checkbox" style="margin-left:10%;" ></td>
                   <td><label for="tonet1Input" style="margin-left:40%;">To net</label></td>
-                 <td><input id="tonet1Input" type="checkbox" style="margin-left:10%;" checked={{ch1['TO_NET']}}></td>
+                 <td><input id="tonet1Input" name="tonet1Input" type="checkbox" style="margin-left:10%;" ></td>
                   <td><label for="todisp1Input" style="margin-left:40%;" >To disp</label></td>
-                 <td><input id="todisp1Input" type="checkbox" style="margin-left:10%;" checked={{ch1['TO_DISP']}}></td>
+                 <td><input id="todisp1Input" name="todisp1Input" type="checkbox" style="margin-left:10%;" ></td>
               </tr>
        
           </table>
@@ -175,21 +161,21 @@
           <table>
               <tr>
                  <td><label for="net2Input">Net</label></td>
-                 <td><input id="net2Input" type="text" style="margin-left:4%;" value={{ch2['NET']}}></td>
+                 <td><input id="net2Input" name="net2Input" type="text" style="margin-left:4%;" value={{ch2['NET']}}></td>
                  <td><label for="station2Input" style="margin-left:20%;">Station</label></td>
-                 <td><input id="station2Input" type="text" value={{ch2['STATION']}}></td>
+                 <td><input id="station2Input" name="station2Input" type="text" value={{ch2['STATION']}}></td>
                   <td><label for="loc2Input" style="margin-left:40%;">Loc</label></td>
-                 <td><input id="loc2Input" type="text" style="margin-left:5%;" value={{ch2['LOC']}}></td>
+                 <td><input id="loc2Input" name="loc2Input" type="text" style="margin-left:5%;" value={{ch2['LOC']}}></td>
              </tr>
              <tr>
                   <td><label for="name2Input">Name</label></td>
-                 <td><input id="name2Input" type="text" style="margin-left:4%;" value={{ch2['NAME']}}></td>
+                 <td><input id="name2Input" name="name2Input" type="text" style="margin-left:4%;" value={{ch2['NAME']}}></td>
                   <td><label for="todisk2Input" style="margin-left:40%;">To disk</label></td>
-                 <td><input id="todisk2Input" type="checkbox" style="margin-left:10%;" checked={{ch2['TO_DISK']}}></td>
+                 <td><input id="todisk2Input" name="todisk2Input" type="checkbox" style="margin-left:10%;" ></td>
                   <td><label for="tonet2Input" style="margin-left:40%;">To net</label></td>
-                 <td><input id="tonet2Input" type="checkbox" style="margin-left:10%;" checked={{ch2['TO_NET']}}></td>
+                 <td><input id="tonet2Input" name="tonet2Input" type="checkbox" style="margin-left:10%;" ></td>
                   <td><label for="todisp2Input" style="margin-left:40%;" >To disp</label></td>
-                 <td><input id="todisp2Input" type="checkbox" style="margin-left:10%;" checked={{ch2['TO_DISP']}}></td>
+                 <td><input id="todisp2Input" name="todisp2Input" type="checkbox" style="margin-left:10%;" ></td>
               </tr>
        
           </table>
@@ -200,21 +186,21 @@
           <table>
               <tr>
                  <td><label for="net3Input">Net</label></td>
-                 <td><input id="net3Input" type="text" style="margin-left:4%;" value={{ch3['NET']}}></td>
+                 <td><input id="net3Input" name="net3Input" type="text" style="margin-left:4%;" value={{ch3['NET']}}></td>
                  <td><label for="station3Input" style="margin-left:20%;">Station</label></td>
-                 <td><input id="station3Input" type="text" value={{ch3['STATION']}}></td>
+                 <td><input id="station3Input" name="station3Input" type="text" value={{ch3['STATION']}}></td>
                   <td><label for="loc3Input" style="margin-left:40%;">Loc</label></td>
-                 <td><input id="loc3Input" type="text" style="margin-left:5%;" value={{ch3['LOC']}}></td>
+                 <td><input id="loc3Input" name="loc3Input" type="text" style="margin-left:5%;" value={{ch3['LOC']}}></td>
              </tr>
              <tr>
                   <td><label for="name3Input">Name</label></td>
-                 <td><input id="name3Input" type="text" style="margin-left:4%;" value={{ch3['NAME']}}></td>
+                 <td><input id="name3Input" name="name3Input" type="text" style="margin-left:4%;" value={{ch3['NAME']}}></td>
                   <td><label for="todisk3Input" style="margin-left:40%;">To disk</label></td>
-                 <td><input id="todisk3Input" type="checkbox" style="margin-left:10%;" checked={{ch3['TO_DISK']}}></td>
+                 <td><input id="todisk3Input" name="todisk3Input" type="checkbox" style="margin-left:10%;" ></td>
                   <td><label for="tonet3Input" style="margin-left:40%;">To net</label></td>
-                 <td><input id="tonet3Input" type="checkbox" style="margin-left:10%;" checked={{ch3['TO_NET']}}></td>
+                 <td><input id="tonet3Input" name="tonet3Input" type="checkbox" style="margin-left:10%;" ></td>
                   <td><label for="todisp3Input" style="margin-left:40%;" >To disp</label></td>
-                 <td><input id="todisp3Input" type="checkbox" style="margin-left:10%;" checked={{ch3['TO_DISP']}}></td>
+                 <td><input id="todisp3Input" name="todisp3Input" type="checkbox" style="margin-left:10%;" ></td>
               </tr>
        
           </table>
@@ -225,21 +211,21 @@
           <table>
               <tr>
                  <td><label for="net4Input">Net</label></td>
-                 <td><input id="net4Input" type="text" style="margin-left:4%;" value={{ch4['NET']}}></td>
+                 <td><input id="net4Input" name="net4Input" type="text" style="margin-left:4%;" value={{ch4['NET']}}></td>
                  <td><label for="station4Input" style="margin-left:20%;">Station</label></td>
-                 <td><input id="station4Input" type="text" value={{ch4['STATION']}}></td>
+                 <td><input id="station4Input" name="station4Input" type="text" value={{ch4['STATION']}}></td>
                   <td><label for="loc4Input" style="margin-left:40%;">Loc</label></td>
-                 <td><input id="loc4Input" type="text" style="margin-left:5%;" value={{ch4['LOC']}}></td>
+                 <td><input id="loc4Input" name="loc4Input" type="text" style="margin-left:5%;" value={{ch4['LOC']}}></td>
              </tr>
              <tr>
                   <td><label for="name4Input">Name</label></td>
-                 <td><input id="name4Input" type="text" style="margin-left:4%;" value={{ch4['NAME']}}></td>
+                 <td><input id="name4Input" name="name4Input" type="text" style="margin-left:4%;" value={{ch4['NAME']}}></td>
                   <td><label for="todisk4Input" style="margin-left:40%;">To disk</label></td>
-                 <td><input id="todisk4Input" type="checkbox" style="margin-left:10%;" checked={{ch4['TO_DISK']}}></td>
+                 <td><input id="todisk4Input" name="todisk4Input" type="checkbox" style="margin-left:10%;" ></td>
                   <td><label for="tonet4Input" style="margin-left:40%;">To net</label></td>
-                 <td><input id="tonet4Input" type="checkbox" style="margin-left:10%;" checked={{ch4['TO_NET']}}></td>
+                 <td><input id="tonet4Input" name="tonet4Input" type="checkbox" style="margin-left:10%;" ></td>
                   <td><label for="todisp4Input" style="margin-left:40%;" >To disp</label></td>
-                 <td><input id="todisp4Input" type="checkbox" style="margin-left:10%;" checked={{ch4['TO_DISP']}}></td>
+                 <td><input id="todisp4Input" name="todisp4Input" type="checkbox" style="margin-left:10%;" ></td>
               </tr>
        
           </table>
@@ -250,21 +236,21 @@
           <table>
               <tr>
                  <td><label for="net5Input">Net</label></td>
-                 <td><input id="net5Input" type="text" style="margin-left:4%;" value={{ch5['NET']}}></td>
+                 <td><input id="net5Input" name="net5Input" type="text" style="margin-left:4%;" value={{ch5['NET']}}></td>
                  <td><label for="station5Input" style="margin-left:20%;">Station</label></td>
-                 <td><input id="station5Input" type="text" value={{ch5['STATION']}}></td>
+                 <td><input id="station5Input" name="station5Input" type="text" value={{ch5['STATION']}}></td>
                   <td><label for="loc5Input" style="margin-left:40%;">Loc</label></td>
-                 <td><input id="loc5Input" type="text" style="margin-left:5%;" value={{ch5['LOC']}}></td>
+                 <td><input id="loc5Input" name="loc5Input" type="text" style="margin-left:5%;" value={{ch5['LOC']}}></td>
              </tr>
              <tr>
                   <td><label for="name5Input">Name</label></td>
-                 <td><input id="name5Input" type="text" style="margin-left:4%;" value={{ch5['NAME']}}></td>
+                 <td><input id="name5Input" name="name5Input" type="text" style="margin-left:4%;" value={{ch5['NAME']}}></td>
                   <td><label for="todisk5Input" style="margin-left:40%;">To disk</label></td>
-                 <td><input id="todisk5Input" type="checkbox" style="margin-left:10%;" checked={{ch5['TO_DISK']}}></td>
+                 <td><input id="todisk5Input" name="todisk5Input" type="checkbox" style="margin-left:10%;" ></td>
                   <td><label for="tonet5Input" style="margin-left:40%;">To net</label></td>
-                 <td><input id="tonet5Input" type="checkbox" style="margin-left:10%;" checked={{ch5['TO_NET']}}></td>
+                 <td><input id="tonet5Input" name="tonet5Input" type="checkbox" style="margin-left:10%;" ></td>
                   <td><label for="todisp5Input" style="margin-left:40%;" >To disp</label></td>
-                 <td><input id="todisp5Input" type="checkbox" style="margin-left:10%;" checked={{ch5['TO_DISP']}}></td>
+                 <td><input id="todisp5Input" name="todisp5Input" type="checkbox" style="margin-left:10%;" ></td>
               </tr>
        
           </table>
@@ -283,17 +269,17 @@
                 </tr>
               <tr>
                  <td><label for="ethpowInput">ETH pow</label></td>
-                 <td ><input id="ethpowInput" type="checkbox" style="margin-left:4%;" checked={{net['ETH_POW']}}></td>
+                 <td ><input id="ethpowInput" name="ethpowInput" type="checkbox" style="margin-left:4%;" ></td>
                  <td><label for="dslpowInput">DSL pow</label></td>
-                 <td><input id="dslpowInput" type="checkbox" style="margin-left:4%;" checked={{net['DSL_POW']}}></td>
+                 <td><input id="dslpowInput" name="dslpowInput" type="checkbox" style="margin-left:4%;" ></td>
                  <td><label for="ethipInput">ETH IP</label></td>
-                 <td><input id="ethipInput" type="text" value={{net['ETH_IP']}}></td>
+                 <td><input id="ethipInput" name="ethipInput" type="text" value={{net['ETH_IP']}}></td>
               </tr>
               <tr>
                   <td><label for="ethmaskInput">ETH Mask</label></td>
-                  <td><input id="ethmaskInput" type="text" value={{net['ETH_MASK']}}></td>
+                  <td><input id="ethmaskInput" name="ethmaskInput" type="text" value={{net['ETH_MASK']}}></td>
                   <td><label for="ethgwInput">ETH GW</label></td>
-                  <td><input id="ethgwInput" type="text" value={{net['ETH_GW']}}></td>
+                  <td><input id="ethgwInput" name="ethgwInput" type="text" value={{net['ETH_GW']}}></td>
               </tr>
 
           </table>
@@ -313,7 +299,7 @@
                  <td><label for="sourceInput">Source</label></td>
                  <td>
                     
-                    <select id="sourceInput">
+                    <select id="sourceInput" name="sourceInput">
                         <option value="0">ext gps</option>
                         <option value="1">int gps</option>
                         <option value="2">ntp</option>
@@ -330,15 +316,15 @@
                     </script>
                 </td>
                  <td><label for="ntpipInput">NTP IP</label></td>
-                 <td><input id="ntpipInput" type="text" value={{time['NTP_IP']}}></td>
+                 <td><input id="ntpipInput" name="ntpipInput" type="text" value={{time['NTP_IP']}}></td>
                  <td><label for="ntpportInput">NTP Port</label></td>
-                 <td><input id="ntpportInput" type="text" value={{time['NTP_PORT']}}></td>
+                 <td><input id="ntpportInput" name="ntpportInput" type="text" value={{time['NTP_PORT']}}></td>
               </tr>
               <tr>
                   <td><label for="gpssleepInput">GPS Sleep time</label></td>
-                  <td><input id="gpssleepInput" type="text" value={{time['GPS_SLEEP_TIME']}}></td>
+                  <td><input id="gpssleepInput" name="gpssleepInput" type="text" value={{time['GPS_SLEEP_TIME']}}></td>
                   <td><label for="ntpserverInput">NTP Server</label></td>
-                  <td><input id="ntpserverInput" type="text" value={{time['NTP_SERVER']}}></td>
+                  <td><input id="ntpserverInput" name="ntpserverInput" type="text" value={{time['NTP_SERVER']}}></td>
               </tr>
 
           </table>
@@ -348,9 +334,27 @@
           <table>
               <tr>
                  <td><label for="service0Input">Service</label></td>
-                 <td><input id="service0Input" type="text" style="margin-left:4%;" value={{soc0['SERVICE']}}></td>
+                 <td>
+                    <select id="service0Input" name="service0Input">
+                        <option value="0">нет</option>
+                        <option value="1">WEB</option>
+                        <option value="2">LISS</option>
+                        <option value="3">SEEDLink</option>
+                        <option value="4">NTP</option>
+                        <option value="5">TFTP</option>
+                    </select>
+                    <script type="text/javascript">
+                        selector=document.querySelector("#service0Input")
+                        try {
+                            selector.selectedIndex={{soc0['SERVICE']}};
+                        } catch(err) {
+                            selector.selectedIndex=0;
+                        }        
+                    </script>
+
+                </td>
                  <td><label for="port0Input" style="margin-left:40%;">Port</label></td>
-                 <td><input id="port0Input" type="text" style="margin-left:10%;" value={{soc0['PORT']}}></td>
+                 <td><input id="port0Input" name="port0Input" type="text" style="margin-left:10%;" value={{soc0['PORT']}}></td>
               </tr>
        
           </table>
@@ -360,9 +364,28 @@
           <table>
               <tr>
                  <td><label for="service1Input">Service</label></td>
-                 <td><input id="service1Input" type="text" style="margin-left:4%;" value={{soc1['SERVICE']}}></td>
+                 <td>
+                    
+                     <select id="service1Input" name="service1Input">
+                        <option value="0">нет</option>
+                        <option value="1">WEB</option>
+                        <option value="2">LISS</option>
+                        <option value="3">SEEDLink</option>
+                        <option value="4">NTP</option>
+                        <option value="5">TFTP</option>
+                    </select>
+                    <script type="text/javascript">
+                        selector=document.querySelector("#service1Input")
+                        try {
+                            selector.selectedIndex={{soc1['SERVICE']}};
+                        } catch(err) {
+                            selector.selectedIndex=0;
+                        }        
+                    </script>
+
+                </td>
                  <td><label for="port1Input" style="margin-left:40%;">Port</label></td>
-                 <td><input id="port1Input" type="text" style="margin-left:10%;" value={{soc1['PORT']}}></td>
+                 <td><input id="port1Input" name="port1Input" type="text" style="margin-left:10%;" value={{soc1['PORT']}}></td>
               </tr>
        
           </table>
@@ -372,9 +395,27 @@
           <table>
               <tr>
                  <td><label for="service2Input">Service</label></td>
-                 <td><input id="service2Input" type="text" style="margin-left:4%;" value={{soc2['SERVICE']}}></td>
+                 <td>
+                    <select id="service2Input" name="service2Input">
+                        <option value="0">нет</option>
+                        <option value="1">WEB</option>
+                        <option value="2">LISS</option>
+                        <option value="3">SEEDLink</option>
+                        <option value="4">NTP</option>
+                        <option value="5">TFTP</option>
+                    </select>
+                    <script type="text/javascript">
+                        selector=document.querySelector("#service2Input")
+                        try {
+                            selector.selectedIndex={{soc2['SERVICE']}};
+                        } catch(err) {
+                            selector.selectedIndex=0;
+                        }        
+                    </script>
+
+                 </td>
                  <td><label for="port2Input" style="margin-left:40%;">Port</label></td>
-                 <td><input id="port2Input" type="text" style="margin-left:10%;" value={{soc2['PORT']}}></td>
+                 <td><input id="port2Input" name="port2Input" type="text" style="margin-left:10%;" value={{soc2['PORT']}}></td>
               </tr>
        
           </table>
@@ -384,9 +425,27 @@
           <table>
               <tr>
                  <td><label for="service3Input">Service</label></td>
-                 <td><input id="service3Input" type="text" style="margin-left:4%;" value={{soc3['SERVICE']}}></td>
+                 <td>
+                    <select id="service3Input" name="service3Input">
+                        <option value="0">нет</option>
+                        <option value="1">WEB</option>
+                        <option value="2">LISS</option>
+                        <option value="3">SEEDLink</option>
+                        <option value="4">NTP</option>
+                        <option value="5">TFTP</option>
+                    </select>
+                    <script type="text/javascript">
+                        selector=document.querySelector("#service3Input")
+                        try {
+                            selector.selectedIndex={{soc3['SERVICE']}};
+                        } catch(err) {
+                            selector.selectedIndex=0;
+                        }        
+                    </script>
+
+                </td>
                  <td><label for="port3Input" style="margin-left:40%;">Port</label></td>
-                 <td><input id="port3Input" type="text" style="margin-left:10%;" value={{soc3['PORT']}}></td>
+                 <td><input id="port3Input" name="port3Input" type="text" style="margin-left:10%;" value={{soc3['PORT']}}></td>
               </tr>
        
           </table>
@@ -396,9 +455,9 @@
           <table>
               <tr>
                  <td width="15%"><label for="dailyrebootInput">Daily Reboot</label></td>
-                 <td width="15%" ><input id="dailyrebootInput" type="checkbox"></td>
+                 <td width="15%" ><input id="dailyrebootInput" name="dailyrebootInput" type="checkbox"></td>
                  <td width="15%"><label for="reboottimeInput">Reboot Time</label></td>
-                 <td ><input id="reboottimeInput" type="time" style="margin-left:10%;"></td>
+                 <td ><input id="reboottimeInput" name="reboottimeInput" type="time" style="margin-left:10%;"></td>
               </tr>
        
           </table>
@@ -406,5 +465,100 @@
             </form>
         </div>
 
+
+<script>
+   
+    if ({{stat['AUTO']}}==1) {
+      document.getElementById("autoInput").checked=true
+    }
+    if ({{net['ETH_POW']}}==1) {
+      document.getElementById("ethpowInput").checked=true
+    }
+    if ({{net['DSL_POW']}}==1) {
+      document.getElementById("dslpowInput").checked=true
+    }
+
+    if ({{ch0['TO_DISK']}}==1) {
+      document.getElementById("todisk0Input").checked=true
+    }
+    if ({{ch0['TO_NET']}}==1) {
+      document.getElementById("tonet0Input").checked=true
+    }
+    if ({{ch0['TO_DISP']}}==1) {
+      document.getElementById("todisp0Input").checked=true
+    }
+
+    if ({{ch1['TO_DISK']}}==1) {
+      document.getElementById("todisk1Input").checked=true
+    }
+    if ({{ch1['TO_NET']}}==1) {
+      document.getElementById("tonet1Input").checked=true
+    }
+    if ({{ch1['TO_DISP']}}==1) {
+      document.getElementById("todisp1Input").checked=true
+    }
+
+    if ({{ch2['TO_DISK']}}==1) {
+      document.getElementById("todisk2Input").checked=true
+    }
+    if ({{ch2['TO_NET']}}==1) {
+      document.getElementById("tonet2Input").checked=true
+    }
+    if ({{ch2['TO_DISP']}}==1) {
+      document.getElementById("todisp2Input").checked=true
+    }
+
+    if ({{ch3['TO_DISK']}}==1) {
+      document.getElementById("todisk3Input").checked=true
+    }
+    if ({{ch3['TO_NET']}}==1) {
+      document.getElementById("tonet3Input").checked=true
+    }
+    if ({{ch3['TO_DISP']}}==1) {
+      document.getElementById("todisp3Input").checked=true
+    }
+
+    if ({{ch4['TO_DISK']}}==1) {
+      document.getElementById("todisk4Input").checked=true
+    }
+    if ({{ch4['TO_NET']}}==1) {
+      document.getElementById("tonet4Input").checked=true
+    }
+    if ({{ch4['TO_DISP']}}==1) {
+      document.getElementById("todisp4Input").checked=true
+    }
+
+    if ({{ch5['TO_DISK']}}==1) {
+      document.getElementById("todisk5Input").checked=true
+    }
+    if ({{ch5['TO_NET']}}==1) {
+      document.getElementById("tonet5Input").checked=true
+    }
+    if ({{ch5['TO_DISP']}}==1) {
+      document.getElementById("todisp5Input").checked=true
+    }
+    
+    $('#selectVersion').change(function(){
+        window.location.href = $(this).val();
+    });
+
+    $(document).ready(function(){
+     let ver="{{chooseVersion}}"
+     if (ver.length>0) {
+       let CheckedOption=document.querySelector("#{{chooseVersion}}")
+       CheckedOption.selected = true;
+     } 
+    });
+    
+    function IsSubmit() {
+        if (window.confirm("Do you want save new ini-file?")) {
+            console.log("yes")
+            $("#submit").click()
+        } else {
+            console.log("No")
+        }
+    }
+    
+</script>
         
 {% endblock %}
