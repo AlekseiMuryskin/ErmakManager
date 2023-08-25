@@ -36,9 +36,12 @@
     }
     .tb2 {
         border:1px solid black;
-        width:100%;
         margin-top:3%;
         margin-bottom:3%;
+    }
+    .tb2 input {
+        box-sizing: border-box;
+        width:70%;
     }
    </style>
 
@@ -74,74 +77,37 @@
                     <th></th>
                     <th></th>
                     <th></th>
+                    <th></th>
+                    <th></th>
                 </tr>
                <tr>
-                <td>
-                   <label for="deviceInput">Device Name</label>
-                </td>
-                <td>
-                   <input id="deviceInput" name="deviceInput" type="text" value={{stat['device_name']}}>
-                </td>
-                <td>
-                   <label for="samprateInput">Samprate</label>
-                </td>
-                <td>
-                   <input id="samprateInput" name="samprateInput"  type="text" value={{stat['samprate']}}>
-               </td>
-                </tr>
-                <tr>
-                   <td>
-                   <label for="lcdInput">LCD on time</label>
-               </td>
-               <td>
-                   <input id="lcdInput" name="lcdInput" type="text" value={{stat['LCD_ON_TIME']}}>
-                </td>
-                <td>
-                   <label for="tempInput">Temp mes int</label>
-                </td>
-                <td>
-                   <input id="tempInput" name="tempInput" type="text" value={{stat['TEMP_MES_INT']}}>
-                 </td>
+                    <td width="13%"><label for="deviceInput">Device Name</label></td>
+                    <td width="23%"><input id="deviceInput" name="deviceInput" type="text" value={{stat['device_name']}}></td>
+                    <td width="10%"><label for="samprateInput">Samprate</label></td>
+                    <td width="23%"><input id="samprateInput" name="samprateInput"  type="text" value={{stat['samprate']}}></td>
+                    <td width="8%"><label for="lcdInput">LCD on time</label></td>
+                    <td><input id="lcdInput" name="lcdInput" type="text" value={{stat['LCD_ON_TIME']}}></td>
                </tr>
                <tr> 
-                 <td>
-                   <label for="senspowInput">Sens pow</label>
-                 </td>
-                 <td>
-                   <input id="senspowInput" name="senspowInput" type="text" value={{stat['SENS_POW']}}>
-                 </td>
-                 <td>
-                   <label for="slowrecInput">Slow rec interval</label>
-                 </td>
-                 <td>
-                   <input id="slowrecInput" name="slowrecInput" type="text" value={{stat['SLOW_REC_INTERVAL']}}>
-                  </td>
+                    <td><label for="tempInput">Temp mes int</label></td>
+                    <td><input id="tempInput" name="tempInput" type="text" value={{stat['TEMP_MES_INT']}}></td>
+                    <td><label for="senspowInput">Sens pow</label></td>
+                    <td><input id="senspowInput" name="senspowInput" type="text" value={{stat['SENS_POW']}}></td>
+                    <td><label for="slowrecInput">Slow rec interval</label></td>
+                    <td><input id="slowrecInput" name="slowrecInput" type="text" value={{stat['SLOW_REC_INTERVAL']}}></td>
                 <tr>
-                 <td>
-                     <label for="gainInput">Gain</label>
-                 </td>
-                 <td>
-                     <input id="gainInput" name="gainInput" type="text" value={{stat['GAIN']}}>
-                 </td>
-                 
-                 <td>
-                     <label for="lenInput">Len</label>
-                 </td>
-                 <td>
-                     <input id="lenInput" name="lenInput" type="text" value={{stat['LEN']}}>
-                 </td>
-               </tr>
-               <tr>
-                <td>
-                     <label for="autoInput">Auto</label>
-                    <input id="autoInput" name="autoInput" type="checkbox" style="margin-left:4%;" >
-                 </td>
+                    <td><label for="gainInput">Gain</label></td>
+                    <td><input id="gainInput" name="gainInput" type="text" value={{stat['GAIN']}}></td>
+                    <td><label for="lenInput">Len</label></td>
+                    <td><input id="lenInput" name="lenInput" type="text" value={{stat['LEN']}}></td>
+                    <td><label for="autoInput">Auto</label></td>
+                    <td><input id="autoInput" name="autoInput" type="checkbox" style="margin-left:4%;" ></td>
                </tr>
            </table>
        </fieldset>
        <fieldset>
          <h4>NET</h4>
-          <table>
+          <table width="100%">
               <tr>
                     <th></th>
                     <th></th>
@@ -151,11 +117,11 @@
                     <th></th>
                 </tr>
               <tr>
-                 <td><label for="ethpowInput">ETH pow</label></td>
-                 <td ><input id="ethpowInput" name="ethpowInput" type="checkbox" style="margin-left:4%;" ></td>
-                 <td><label for="dslpowInput">DSL pow</label></td>
-                 <td><input id="dslpowInput" name="dslpowInput" type="checkbox" style="margin-left:4%;" ></td>
-                 <td><label for="ethipInput">ETH IP</label></td>
+                 <td width="13%"><label for="ethpowInput">ETH pow</label></td>
+                 <td width="23%"><input id="ethpowInput" name="ethpowInput" type="checkbox" ></td>
+                 <td width="10%"><label for="dslpowInput">DSL pow</label></td>
+                 <td width="23%"><input id="dslpowInput" name="dslpowInput" type="checkbox" ></td>
+                 <td width="8%"><label for="ethipInput">ETH IP</label></td>
                  <td><input id="ethipInput" name="ethipInput" type="text" value={{net['ETH_IP']}}></td>
               </tr>
               <tr>
@@ -169,7 +135,7 @@
        </fieldset>
        <fieldset>
          <h4>Time</h4>
-          <table>
+          <table width="100%">
             <tr>
                     <th></th>
                     <th></th>
@@ -179,8 +145,8 @@
                     <th></th>
                 </tr>
               <tr>
-                 <td><label for="sourceInput">Source</label></td>
-                 <td>
+                 <td width="13%"><label for="sourceInput">Source</label></td>
+                 <td width="23%">
                     
                     <select id="sourceInput" name="sourceInput">
                         <option value="0">ext gps</option>
@@ -198,9 +164,9 @@
                         
                     </script>
                 </td>
-                 <td><label for="ntpipInput">NTP IP</label></td>
-                 <td><input id="ntpipInput" name="ntpipInput" type="text" value={{time['NTP_IP']}}></td>
-                 <td><label for="ntpportInput">NTP Port</label></td>
+                 <td width="10%"><label for="ntpipInput">NTP IP</label></td>
+                 <td width="23%"><input id="ntpipInput" name="ntpipInput" type="text" value={{time['NTP_IP']}}></td>
+                 <td width="8%"><label for="ntpportInput">NTP Port</label></td>
                  <td><input id="ntpportInput" name="ntpportInput" type="text" value={{time['NTP_PORT']}}></td>
               </tr>
               <tr>
@@ -225,11 +191,11 @@
              <th>To display</th>
            </tr>
            <tr>
-               <td>0</td>
-               <td><input id="net0Input" name="net0Input" type="text" value={{ch0['NET']}}></td>
-               <td><input id="station0Input" name="station0Input" type="text" value={{ch0['STATION']}}></td>
-               <td><input id="loc0Input" name="loc0Input" type="text" value={{ch0['LOC']}}></td>
-               <td><input id="name0Input" name="name0Input" type="text" value={{ch0['NAME']}}></td>
+               <td width="5%">0</td>
+               <td width="15%"><input id="net0Input" name="net0Input" type="text" value={{ch0['NET']}}></td>
+               <td width="15%"><input id="station0Input" name="station0Input" type="text" value={{ch0['STATION']}}></td>
+               <td width="15%"><input id="loc0Input" name="loc0Input" type="text" value={{ch0['LOC']}}></td>
+               <td width="15%"><input id="name0Input" name="name0Input" type="text" value={{ch0['NAME']}}></td>
                <td><input id="todisk0Input" name="todisk0Input" type="checkbox"></td>
                <td><input id="tonet0Input" name="tonet0Input" type="checkbox"></td>
                <td><input id="todisp0Input" name="todisp0Input" type="checkbox"></td>
