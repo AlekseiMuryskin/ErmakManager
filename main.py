@@ -4,13 +4,32 @@ from flask import Flask, request
 from flask import render_template
 from configparser import ConfigParser
 import shutil
+import requests
 
 app=Flask(__name__)
+
+def getStatusCode(dirlist):
+    pth = "./ini/"
+    statusCodes={}
+    for sta in dirlist:
+        fname = pth + sta+ "/seisview_imp.ini"
+        config = ConfigParser()
+        config.read(fname)
+        try:
+            r=requests.get(f"http://{config.get('NET', 'ETH_IP')}/status").status_code == 200
+        except:
+            r=False
+        if r:
+            statusCodes[sta] = "green"
+        else:
+            statusCodes[sta] = "green"
+    return statusCodes
 
 @app.route('/')
 def index():
     pth="./ini/"
     dirlist=os.listdir(pth)
+    statusCodes=getStatusCode(dirlist)
     stat={}
     net = {}
     time = {}
@@ -29,7 +48,7 @@ def index():
     flist={}
     return render_template('index.html',  station=dirlist, chooseSta=chooseSta,chooseVersion=chooseVersion, stat=stat, net=net, time=time,
                            soc0=socket0, soc1=socket1, soc2=socket2, soc3=socket3,
-                           ch0=ch0, ch1=ch1, ch2=ch2, ch3=ch3, ch4=ch4, ch5=ch5, version_list=flist)
+                           ch0=ch0, ch1=ch1, ch2=ch2, ch3=ch3, ch4=ch4, ch5=ch5, version_list=flist, statusCodes=statusCodes)
 
 @app.route('/<station>/<version>', methods=["GET","POST"])
 def stationProp(station,version):
@@ -151,6 +170,7 @@ def stationProp(station,version):
     ch5['TO_DISP'] = int(config.get('CH5', 'TO_DISP'))
     chooseSta=station
     chooseVersion = version
+    statusCodes = getStatusCode(dirlist)
     if request.method=="POST":
 
         pth = "./ini/"
@@ -300,10 +320,10 @@ def stationProp(station,version):
         flist=flist[::-1]
         return render_template('index.html', station=dirlist, chooseSta=chooseSta,chooseVersion=chooseVersion, stat=stat, net=net, time=time,
                            soc0=socket0, soc1=socket1, soc2=socket2, soc3=socket3,
-                           ch0=ch0, ch1=ch1, ch2=ch2, ch3=ch3, ch4=ch4, ch5=ch5, version_list=flist)
+                           ch0=ch0, ch1=ch1, ch2=ch2, ch3=ch3, ch4=ch4, ch5=ch5, version_list=flist, statusCodes=statusCodes)
 
     return render_template('index.html', station=dirlist, chooseSta=chooseSta,chooseVersion=chooseVersion, stat=stat, net=net, time=time,
                            soc0=socket0, soc1=socket1, soc2=socket2, soc3=socket3,
-                           ch0=ch0, ch1=ch1, ch2=ch2, ch3=ch3, ch4=ch4, ch5=ch5, version_list=flist)
+                           ch0=ch0, ch1=ch1, ch2=ch2, ch3=ch3, ch4=ch4, ch5=ch5, version_list=flist, statusCodes=statusCodes)
 
 app.run(host='0.0.0.0', port=81)

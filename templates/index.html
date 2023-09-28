@@ -2,7 +2,7 @@
 
 {% block navigate %}
  {% for sta in station %}
- <li><a href="http://192.168.35.94:81/{{sta}}/last">{{sta}}</a></li>
+ <li><a href="http://192.168.35.94:81/{{sta}}/last">{{sta}} <div style="color:{{statusCodes[sta]}};display:inline-block;font-size:140%;">  ●</div></a>  </li>
  {% endfor %}
  
 {% endblock %}
