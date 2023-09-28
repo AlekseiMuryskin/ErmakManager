@@ -4,6 +4,7 @@ from flask import Flask, request
 from flask import render_template
 from configparser import ConfigParser
 import shutil
+import asyncio
 import requests
 
 app=Flask(__name__)
@@ -15,8 +16,9 @@ def getStatusCode(dirlist):
         fname = pth + sta+ "/seisview_imp.ini"
         config = ConfigParser()
         config.read(fname)
+        #statusCodes[sta]=f"http://{config.get('NET', 'ETH_IP')}/status"
         try:
-            r=requests.get(f"http://{config.get('NET', 'ETH_IP')}/status").status_code == 200
+            r=requests.get(f"http://{config.get('NET', 'ETH_IP')}/status", timeout=0.1).status_code == 200
         except:
             r=False
         if r:
@@ -43,11 +45,12 @@ def index():
     ch3 = {}
     ch4 = {}
     ch5 = {}
+    reboot={}
     chooseSta = ""
     chooseVersion = ""
     flist={}
     return render_template('index.html',  station=dirlist, chooseSta=chooseSta,chooseVersion=chooseVersion, stat=stat, net=net, time=time,
-                           soc0=socket0, soc1=socket1, soc2=socket2, soc3=socket3,
+                           soc0=socket0, soc1=socket1, soc2=socket2, soc3=socket3, reboot=reboot,
                            ch0=ch0, ch1=ch1, ch2=ch2, ch3=ch3, ch4=ch4, ch5=ch5, version_list=flist, statusCodes=statusCodes)
 
 @app.route('/<station>/<version>', methods=["GET","POST"])
@@ -89,7 +92,10 @@ def stationProp(station,version):
     time['NTP_IP'] = config.get('TIME', 'NTP_IP')
     time['NTP_PORT'] = config.get('TIME', 'NTP_PORT')
     time['GPS_SLEEP_TIME'] = config.get('TIME', 'GPS_SLEEP_TIME')
-    time['NTP_SERVER'] = config.get('TIME', 'NTP_SERVER')
+    try:
+        time['NTP_SERVER'] = config.get('TIME', 'NTP_SERVER')
+    except:
+        time['NTP_SERVER']=0
 
     socket0={}
     socket0['SERVICE']=config.get('SOCKET0','SERVICE')
@@ -168,6 +174,14 @@ def stationProp(station,version):
     ch5['TO_DISK'] = int(config.get('CH5', 'TO_DISK'))
     ch5['TO_NET'] = int(config.get('CH5', 'TO_NET'))
     ch5['TO_DISP'] = int(config.get('CH5', 'TO_DISP'))
+
+    reboot={}
+    try:
+        reboot['DAILY_REBOOT']=int(config.get('REBOOT', 'DAILY_REBOOT'))
+        reboot['REBOOT_TIME'] = config.get('REBOOT', 'REBOOT_TIME')
+    except:
+        reboot['DAILY_REBOOT'] = 0
+        reboot['REBOOT_TIME'] = "00:00"
     chooseSta=station
     chooseVersion = version
     statusCodes = getStatusCode(dirlist)
@@ -285,10 +299,14 @@ def stationProp(station,version):
         ch5['TO_NET'] = int(bool(request.form.get("tonet5Input")))
         ch5['TO_DISP'] = int(bool(request.form.get("todisp5Input")))
 
+        reboot['DAILY_REBOOT'] = int(bool(request.form.get("dailyrebootInput")))
+        reboot['REBOOT_TIME'] = request.form.get("reboottimeInput")
+
         chooseSta = station
         new_inifile=configparser.ConfigParser()
         new_inifile['SYSTEM']=stat
         new_inifile['CH0']=ch0
+
         new_inifile['CH1'] = ch1
         new_inifile['CH2'] = ch2
         new_inifile['CH3'] = ch3
@@ -300,12 +318,16 @@ def stationProp(station,version):
         new_inifile['SOCKET1'] = socket1
         new_inifile['SOCKET2'] = socket2
         new_inifile['SOCKET3'] = socket3
+        new_inifile['REBOOT'] = socket3
         ver=len(flist)
 
         shutil.copy2(pth+station+"/seisview_imp.ini", pth+station+"/seisview_imp_v"+str(ver)+".ini")
 
         with open(pth+station+"/seisview_imp.ini", "w") as file_object:
             new_inifile.write(file_object)
+
+        #cmd=f"tftp.exe -i -v {net['ETH_IP']} put {pth+station+'/seisview_imp.ini'}"
+        #os.system(cmd)
 
         if int(socket0['SERVICE'])==7:
             socket0['SERVICE']=5
@@ -319,11 +341,11 @@ def stationProp(station,version):
         flist = sorted([x.replace("seisview_imp", "last").replace(".ini", "").replace("last_","") for x in flist], key=len)
         flist=flist[::-1]
         return render_template('index.html', station=dirlist, chooseSta=chooseSta,chooseVersion=chooseVersion, stat=stat, net=net, time=time,
-                           soc0=socket0, soc1=socket1, soc2=socket2, soc3=socket3,
+                           soc0=socket0, soc1=socket1, soc2=socket2, soc3=socket3, reboot=reboot,
                            ch0=ch0, ch1=ch1, ch2=ch2, ch3=ch3, ch4=ch4, ch5=ch5, version_list=flist, statusCodes=statusCodes)
 
     return render_template('index.html', station=dirlist, chooseSta=chooseSta,chooseVersion=chooseVersion, stat=stat, net=net, time=time,
-                           soc0=socket0, soc1=socket1, soc2=socket2, soc3=socket3,
+                           soc0=socket0, soc1=socket1, soc2=socket2, soc3=socket3, reboot=reboot,
                            ch0=ch0, ch1=ch1, ch2=ch2, ch3=ch3, ch4=ch4, ch5=ch5, version_list=flist, statusCodes=statusCodes)
 
 app.run(host='0.0.0.0', port=81)

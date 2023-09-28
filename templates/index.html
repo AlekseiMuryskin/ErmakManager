@@ -2,9 +2,9 @@
 
 {% block navigate %}
  {% for sta in station %}
- <li><a href="http://192.168.35.94:81/{{sta}}/last">{{sta}} <div style="color:{{statusCodes[sta]}};display:inline-block;font-size:140%;">  ●</div></a>  </li>
+ <li><a id="{{sta}}" title="{{statusCodes[sta]}}" href="http://192.168.35.94:81/{{sta}}/last">{{sta}} <div style="display:inline-block;font-size:140%;color:{{statusCodes[sta]}}"> ●</div></a> </li>
  {% endfor %}
- 
+
 {% endblock %}
 
 {% block content %}
@@ -49,6 +49,7 @@
     
         <a href="#">
             <h2>Ermak Manager</h2>
+            <h5>{{chooseSta}}</h5>
         </a>
         <span class="badge badge-primary"></span>
         <hr>
@@ -65,9 +66,11 @@
        </div>
         <div>
             <button onclick="IsSubmit()" class="btn btn-primary">Send</button>
+            <button onclick="IsGetini()" class="btn btn-primary">Get</button>
             <form method="post">
                 <div> 
                     <button id="submit" type="submit" class="btn btn-primary" style="display:none;">Submit</button>
+                    <button id="getini" type="submit" class="btn btn-primary" style="display:none;">Get ini</button>
                 </div>
                 <fieldset>
                 <h4>System</h4>
@@ -122,7 +125,7 @@
                  <td width="10%"><label for="dslpowInput">DSL pow</label></td>
                  <td width="23%"><input id="dslpowInput" name="dslpowInput" type="checkbox" ></td>
                  <td width="8%"><label for="ethipInput">ETH IP</label></td>
-                 <td><input id="ethipInput" name="ethipInput" type="text" value={{net['ETH_IP']}}></td>
+                 <td><input id="ethipInput" name="ethipInput" type="text" value={{net['ETH_IP']}} readonly></td>
               </tr>
               <tr>
                   <td><label for="ethmaskInput">ETH Mask</label></td>
@@ -203,7 +206,7 @@
            <tr>
                <td>1</td>
                <td><input id="net1Input" name="net1Input" type="text" value={{ch1['NET']}}></td>
-               <td><input id="station0Input" name="station0Input" type="text" value={{ch1['STATION']}}></td>
+               <td><input id="station0Input" name="station1Input" type="text" value={{ch1['STATION']}}></td>
                <td><input id="loc1Input" name="loc1Input" type="text" value={{ch1['LOC']}}></td>
                <td><input id="name1Input" name="name1Input" type="text" value={{ch1['NAME']}}></td>
                <td><input id="todisk1Input" name="todisk1Input" type="checkbox"></td>
@@ -248,6 +251,16 @@
                <td><input id="todisk5Input" name="todisk5Input" type="checkbox"></td>
                <td><input id="tonet5Input" name="tonet5Input" type="checkbox"></td>
                <td><input id="todisp5Input" name="todisp5Input" type="checkbox"></td>
+           </tr>
+           <tr style="background-color: rgb(250, 128, 114);">
+               <td>6</td>
+               <td><input id="net6Input" name="net6Input" type="text" value={{ch5['NET']}}></td>
+               <td><input id="station6Input" name="station6Input" type="text" value={{ch5['STATION']}}></td>
+               <td><input id="loc6Input" name="loc6Input" type="text" value={{ch5['LOC']}}></td>
+               <td><input id="name6Input" name="name6Input" type="text" value={{ch5['NAME']}}></td>
+               <td><input id="todisk6Input" name="todisk6Input" type="checkbox"></td>
+               <td><input id="tonet6Input" name="tonet6Input" type="checkbox"></td>
+               <td><input id="todisp6Input" name="todisp6Input" type="checkbox"></td>
            </tr>
        </table>
 
@@ -355,7 +368,7 @@
                  <td width="15%"><label for="dailyrebootInput">Daily Reboot</label></td>
                  <td width="15%" ><input id="dailyrebootInput" name="dailyrebootInput" type="checkbox"></td>
                  <td width="15%"><label for="reboottimeInput">Reboot Time</label></td>
-                 <td ><input id="reboottimeInput" name="reboottimeInput" type="time" style="margin-left:10%;"></td>
+                 <td ><input id="reboottimeInput" name="reboottimeInput" type="text" value={{reboot['REBOOT_TIME']}} style="margin-left:10%;"></td>
               </tr>
        
           </table>
@@ -435,6 +448,18 @@
     if ({{ch5['TO_DISP']}}==1) {
       document.getElementById("todisp5Input").checked=true
     }
+    if ({{reboot['DAILY_REBOOT']}}==1) {
+      document.getElementById("dailyrebootInput").checked=true
+    }
+     if ({{ch5['TO_DISK']}}==1) {
+      document.getElementById("todisk6Input").checked=true
+    }
+    if ({{ch5['TO_NET']}}==1) {
+      document.getElementById("tonet6Input").checked=true
+    }
+    if ({{ch5['TO_DISP']}}==1) {
+      document.getElementById("todisp6Input").checked=true
+    }
     
     $('#selectVersion').change(function(){
         window.location.href = $(this).val();
@@ -456,6 +481,16 @@
             console.log("No")
         }
     }
+
+    function IsGetini() {
+        if (window.confirm("Do you want get current ini-file from station?")) {
+            console.log("yes")
+            //$("#submit").click()
+        } else {
+            console.log("No")
+        }
+    }
+    
     
 </script>
         
