@@ -55,6 +55,16 @@ def index():
                            soc0=socket0, soc1=socket1, soc2=socket2, soc3=socket3, reboot=reboot,
                            ch0=ch0, ch1=ch1, ch2=ch2, ch3=ch3, ch4=ch4, ch5=ch5,ch6=ch6, version_list=flist, statusCodes=statusCodes)
 
+@app.route('/newsta')
+def newStation():
+    pth="./ini/"
+    dirlist=os.listdir(pth)
+    statusCodes=getStatusCode(dirlist)
+    chooseSta = ""
+    return render_template('newsta.html',  station=dirlist, statusCodes=statusCodes, chooseSta=chooseSta)
+
+
+
 @app.route('/<station>/<version>', methods=["GET","POST"])
 def stationProp(station,version):
 
@@ -582,10 +592,37 @@ def stationProp(station,version):
                                    ch0=ch0, ch1=ch1, ch2=ch2, ch3=ch3, ch4=ch4, ch5=ch5, ch6=ch6, version_list=flist,
                                    statusCodes=statusCodes)
         elif int(bool(request.form.get("isAdd")))==1:
-            return "Add station page"
+            return request.form.get("newStationIp")
 
         elif int(bool(request.form.get("isDelete")))==1:
-            return "Delete station page"
+            pth = "./ini/"
+            shutil.rmtree(pth + station)
+            dirlist = os.listdir(pth)
+            statusCodes = getStatusCode(dirlist)
+            stat = {}
+            net = {}
+            time = {}
+            socket0 = {}
+            socket1 = {}
+            socket2 = {}
+            socket3 = {}
+            ch0 = {}
+            ch1 = {}
+            ch2 = {}
+            ch3 = {}
+            ch4 = {}
+            ch5 = {}
+            ch6 = {}
+            reboot = {}
+            chooseSta = ""
+            chooseVersion = ""
+            flist = {}
+            return render_template('index.html', station=dirlist, chooseSta=chooseSta, chooseVersion=chooseVersion,
+                                   stat=stat, net=net, time=time,
+                                   soc0=socket0, soc1=socket1, soc2=socket2, soc3=socket3, reboot=reboot,
+                                   ch0=ch0, ch1=ch1, ch2=ch2, ch3=ch3, ch4=ch4, ch5=ch5, ch6=ch6, version_list=flist,
+                                   statusCodes=statusCodes)
+
 
         else:
             #shutil.copy2(pth + station + "/seisview_imp.ini", pth + station + "/seisview_imp_v" + str(ver) + ".ini")
@@ -970,5 +1007,7 @@ def stationProp(station,version):
     return render_template('index.html', station=dirlist, chooseSta=chooseSta,chooseVersion=chooseVersion, stat=stat, net=net, time=time,
                            soc0=socket0, soc1=socket1, soc2=socket2, soc3=socket3, reboot=reboot,
                            ch0=ch0, ch1=ch1, ch2=ch2, ch3=ch3, ch4=ch4, ch5=ch5,ch6=ch6, version_list=flist, statusCodes=statusCodes)
+
+
 
 app.run(host='0.0.0.0', port=81)

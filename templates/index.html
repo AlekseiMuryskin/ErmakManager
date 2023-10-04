@@ -71,6 +71,7 @@
         <div>
 
         <label for="selectStation">Select version:</label>
+
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <select id="selectVersion">
             {% for ver in version_list %}
@@ -398,6 +399,8 @@
         </div>
 
 
+
+
 <script>
   $(document).ready(function(){
      let ver="{{chooseVersion}}"
@@ -407,62 +410,6 @@
      } 
     });
 
-    function IsSubmit() {
-        document.querySelector("#isSend").checked=true
-        document.querySelector("#isAdd").checked=false
-        document.querySelector("#isDelete").checked=false
-        if (window.confirm("Do you want save new ini-file?")) {
-            console.log("yes")
-            $("#submit").click()
-        } else {
-            console.log("No")
-        }
-    }
-
-    function IsGetini() {
-        document.querySelector("#isSend").checked=false
-        document.querySelector("#isAdd").checked=false
-        document.querySelector("#isDelete").checked=false
-        if (window.confirm("Do you want get current ini-file from station?")) {
-            console.log("yes")
-            $("#submit").click()
-        } else {
-            console.log("No")
-        }
-    }
-
-    function IsAdd() {
-        document.querySelector("#isSend").checked=false
-        document.querySelector("#isAdd").checked=true
-        document.querySelector("#isDelete").checked=false
-        if (window.confirm("Do you want add new station?")) {
-            console.log("yes")
-            $("#add").click()
-            window.location.href = 'http://192.168.35.94:81/';
-        } else {
-            console.log("No")
-        }
-    }
-
-    function IsDelete() {
-        document.querySelector("#isSend").checked=false
-        document.querySelector("#isAdd").checked=false
-        document.querySelector("#isDelete").checked=true
-        if (window.confirm("Do you want delete current station?")) {
-            console.log("yes")
-            $("#delete").click()
-            window.location.href = 'http://192.168.35.94:81/';
-        } else {
-            console.log("No")
-        }
-    }
-$(document).ready(function(){
-     let ver="{{chooseVersion}}"
-     if (ver.length>0) {
-       let CheckedOption=document.querySelector("#{{chooseVersion}}")
-       CheckedOption.selected = true;
-     } 
-    });
 
     function IsSubmit() {
         document.querySelector("#isSend").checked=true
@@ -494,7 +441,7 @@ $(document).ready(function(){
         document.querySelector("#isDelete").checked=false
         if (window.confirm("Do you want add new station?")) {
             console.log("yes")
-            $("#add").click()
+            //$("#add").click()
             //window.location.href = 'http://192.168.35.94:81/';
         } else {
             console.log("No")
@@ -514,6 +461,7 @@ $(document).ready(function(){
         }
     }
 
+   
 
     if ({{stat['AUTO']}}==1) {
       document.getElementById("autoInput").checked=true
