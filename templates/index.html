@@ -1,8 +1,19 @@
 {% extends 'base.html' %}
 
 {% block navigate %}
+<style>
+    a.curSta {
+        font-weight:bold;
+        color:red;
+    }
+</style>
  {% for sta in station %}
- <li><a id="{{sta}}" title="{{statusCodes[sta]}}" href="http://192.168.35.94:81/{{sta}}/last">{{sta}} <div style="display:inline-block;font-size:140%;color:{{statusCodes[sta]}}"> ●</div></a> </li>
+    {% if sta == chooseSta %}
+        <li><a id="{{sta}}" class="curSta" title="{{statusCodes[sta]}}" href="http://192.168.35.94:81/{{sta}}/last">{{sta}} <div style="display:inline-block;font-size:140%;color:{{statusCodes[sta]}}"> ●</div></a> </li>
+    {% else %}
+       <li><a id="{{sta}}" title="{{statusCodes[sta]}}" href="http://192.168.35.94:81/{{sta}}/last">{{sta}} <div style="display:inline-block;font-size:140%;color:{{statusCodes[sta]}}"> ●</div></a> </li>
+    {% endif %}
+ 
  {% endfor %}
 
 {% endblock %}
@@ -43,6 +54,10 @@
         box-sizing: border-box;
         width:70%;
     }
+    input[type="number"] {
+        width: 100%;
+    }
+    
    </style>
 
     <h1>{% block title %}  {% endblock %}</h1>
@@ -70,7 +85,11 @@
             <form method="post">
                 <div> 
                     <button id="submit" type="submit" class="btn btn-primary" style="display:none;">Submit</button>
-                    <button id="getini" type="submit" class="btn btn-primary" style="display:none;">Get ini</button>
+                    <button id="add" type="submit" class="btn btn-primary" style="display:none;">Add</button>
+                    <button id="delete" type="submit" class="btn btn-primary" style="display:none;">Delete</button>
+                    <input id="isSend" name="isSend" type="checkbox" style="display:none;"/>
+                    <input id="isAdd" name="isAdd" type="checkbox" style="display:none;"/>
+                    <input id="isDelete" name="isDelete" type="checkbox" style="display:none;"/>
                 </div>
                 <fieldset>
                 <h4>System</h4>
@@ -85,25 +104,25 @@
                 </tr>
                <tr>
                     <td width="13%"><label for="deviceInput">Device Name</label></td>
-                    <td width="23%"><input id="deviceInput" name="deviceInput" type="text" value={{stat['device_name']}}></td>
+                    <td width="23%"><input id="deviceInput" name="deviceInput" type="text" maxlength="32" value="{{stat['device_name']}}" required></td>
                     <td width="10%"><label for="samprateInput">Samprate</label></td>
-                    <td width="23%"><input id="samprateInput" name="samprateInput"  type="text" value={{stat['samprate']}}></td>
+                    <td width="23%"><input id="samprateInput" name="samprateInput"  type="number" max="2000" min="10" step="10" value="{{stat['samprate']}}" required></td>
                     <td width="8%"><label for="lcdInput">LCD on time</label></td>
-                    <td><input id="lcdInput" name="lcdInput" type="text" value={{stat['LCD_ON_TIME']}}></td>
+                    <td><input id="lcdInput" name="lcdInput" type="number" min="1" max="255" value="{{stat['LCD_ON_TIME']}}" required></td>
                </tr>
                <tr> 
                     <td><label for="tempInput">Temp mes int</label></td>
-                    <td><input id="tempInput" name="tempInput" type="text" value={{stat['TEMP_MES_INT']}}></td>
-                    <td><label for="senspowInput">Sens pow</label></td>
-                    <td><input id="senspowInput" name="senspowInput" type="text" value={{stat['SENS_POW']}}></td>
+                    <td><input id="tempInput" name="tempInput" type="number" min="60" max="65535" value="{{stat['TEMP_MES_INT']}}" required></td>
+                    <td><label for="lenInput">File len</label></td>
+                    <td><input id="lenInput" name="lenInput" type="number" value="{{stat['LEN']}}"></td>
                     <td><label for="slowrecInput">Slow rec interval</label></td>
-                    <td><input id="slowrecInput" name="slowrecInput" type="text" value={{stat['SLOW_REC_INTERVAL']}}></td>
+                    <td><input id="slowrecInput" name="slowrecInput" type="number" min="0" max="4294967296" value="{{stat['SLOW_REC_INTERVAL']}}" required></td>
                 <tr>
                     <td><label for="gainInput">Gain</label></td>
-                    <td><input id="gainInput" name="gainInput" type="text" value={{stat['GAIN']}}></td>
-                    <td><label for="lenInput">Len</label></td>
-                    <td><input id="lenInput" name="lenInput" type="text" value={{stat['LEN']}}></td>
-                    <td><label for="autoInput">Auto</label></td>
+                    <td><input id="gainInput" name="gainInput" type="checkbox"></td>
+                    <td><label for="senspowInput">Sens pow</label></td>
+                    <td><input id="senspowInput" name="senspowInput" type="checkbox"></td>
+                    <td><label for="autoInput">Auto Start</label></td>
                     <td><input id="autoInput" name="autoInput" type="checkbox" style="margin-left:4%;" ></td>
                </tr>
            </table>
@@ -124,14 +143,14 @@
                  <td width="23%"><input id="ethpowInput" name="ethpowInput" type="checkbox" ></td>
                  <td width="10%"><label for="dslpowInput">DSL pow</label></td>
                  <td width="23%"><input id="dslpowInput" name="dslpowInput" type="checkbox" ></td>
-                 <td width="8%"><label for="ethipInput">ETH IP</label></td>
-                 <td><input id="ethipInput" name="ethipInput" type="text" value={{net['ETH_IP']}} readonly></td>
               </tr>
               <tr>
-                  <td><label for="ethmaskInput">ETH Mask</label></td>
-                  <td><input id="ethmaskInput" name="ethmaskInput" type="text" value={{net['ETH_MASK']}}></td>
-                  <td><label for="ethgwInput">ETH GW</label></td>
-                  <td><input id="ethgwInput" name="ethgwInput" type="text" value={{net['ETH_GW']}}></td>
+                  <td><label for="ethipInput">IP</label></td>
+                  <td><input id="ethipInput" name="ethipInput" type="text" value="{{net['ETH_IP']}}" readonly></td>
+                  <td><label for="ethmaskInput">Mask</label></td>
+                  <td><input id="ethmaskInput" name="ethmaskInput" type="text"  pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" value="{{net['ETH_MASK']}}" required></td>
+                  <td width="8%"><label for="ethgwInput">GW</label></td>
+                  <td><input id="ethgwInput" name="ethgwInput" type="text"  pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" value="{{net['ETH_GW']}}" required></td>
               </tr>
 
           </table>
@@ -167,16 +186,14 @@
                         
                     </script>
                 </td>
-                 <td width="10%"><label for="ntpipInput">NTP IP</label></td>
-                 <td width="23%"><input id="ntpipInput" name="ntpipInput" type="text" value={{time['NTP_IP']}}></td>
-                 <td width="8%"><label for="ntpportInput">NTP Port</label></td>
-                 <td><input id="ntpportInput" name="ntpportInput" type="text" value={{time['NTP_PORT']}}></td>
+                 <td width="9%"><label for="ntpipInput">NTP IP</label></td>
+                 <td width="23%"><input id="ntpipInput" name="ntpipInput" type="text"  pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" value="{{time['NTP_IP']}}" ></td>
+                 <td width="7%"><label for="ntpportInput">NTP Port</label></td>
+                 <td><input id="ntpportInput" name="ntpportInput" type="number" min="1" max="65535" value="{{time['NTP_PORT']}}" ></td>
               </tr>
               <tr>
                   <td><label for="gpssleepInput">GPS Sleep time</label></td>
-                  <td><input id="gpssleepInput" name="gpssleepInput" type="text" value={{time['GPS_SLEEP_TIME']}}></td>
-                  <td><label for="ntpserverInput">NTP Server</label></td>
-                  <td><input id="ntpserverInput" name="ntpserverInput" type="text" value={{time['NTP_SERVER']}}></td>
+                  <td><input id="gpssleepInput" name="gpssleepInput" type="number" min="0" max="65535" value="{{time['GPS_SLEEP_TIME']}}"></td>
               </tr>
 
           </table>
@@ -195,69 +212,69 @@
            </tr>
            <tr>
                <td width="5%">0</td>
-               <td width="15%"><input id="net0Input" name="net0Input" type="text" value={{ch0['NET']}}></td>
-               <td width="15%"><input id="station0Input" name="station0Input" type="text" value={{ch0['STATION']}}></td>
-               <td width="15%"><input id="loc0Input" name="loc0Input" type="text" value={{ch0['LOC']}}></td>
-               <td width="15%"><input id="name0Input" name="name0Input" type="text" value={{ch0['NAME']}}></td>
+               <td width="15%"><input id="net0Input" name="net0Input" maxlength="2" type="text" value="{{ch0['NET']}}" required></td>
+               <td width="15%"><input id="station0Input" name="station0Input" maxlength="5" type="text" value="{{ch0['STATION']}}" required></td>
+               <td width="15%"><input id="loc0Input" name="loc0Input" type="text" size="2" maxlength="2" minlength="2" value="{{ch0['LOC']}}"></td>
+               <td width="15%"><input id="name0Input" name="name0Input" type="text" size="3" maxlength="3" minlength="3" value="{{ch0['NAME']}}" required></td>
                <td><input id="todisk0Input" name="todisk0Input" type="checkbox"></td>
                <td><input id="tonet0Input" name="tonet0Input" type="checkbox"></td>
                <td><input id="todisp0Input" name="todisp0Input" type="checkbox"></td>
            </tr>
            <tr>
                <td>1</td>
-               <td><input id="net1Input" name="net1Input" type="text" value={{ch1['NET']}}></td>
-               <td><input id="station0Input" name="station1Input" type="text" value={{ch1['STATION']}}></td>
-               <td><input id="loc1Input" name="loc1Input" type="text" value={{ch1['LOC']}}></td>
-               <td><input id="name1Input" name="name1Input" type="text" value={{ch1['NAME']}}></td>
+               <td><input id="net1Input" name="net1Input" type="text" maxlength="2" value="{{ch1['NET']}}" required></td>
+               <td><input id="station0Input" name="station1Input" type="text" maxlength="5"  value="{{ch1['STATION']}}" required></td>
+               <td><input id="loc1Input" name="loc1Input" type="text" size="2" maxlength="2" minlength="2" value="{{ch1['LOC']}}"></td>
+               <td><input id="name1Input" name="name1Input" type="text" size="3" maxlength="3" minlength="3" value="{{ch1['NAME']}}" required></td>
                <td><input id="todisk1Input" name="todisk1Input" type="checkbox"></td>
                <td><input id="tonet1Input" name="tonet1Input" type="checkbox"></td>
                <td><input id="todisp1Input" name="todisp1Input" type="checkbox"></td>
            <tr>
                <td>2</td>
-               <td><input id="net2Input" name="net2Input" type="text" value={{ch2['NET']}}></td>
-               <td><input id="station2Input" name="station2Input" type="text" value={{ch2['STATION']}}></td>
-               <td><input id="loc2Input" name="loc2Input" type="text" value={{ch2['LOC']}}></td>
-               <td><input id="name2Input" name="name2Input" type="text" value={{ch2['NAME']}}></td>
+               <td><input id="net2Input" name="net2Input" type="text" maxlength="2" value="{{ch2['NET']}}" required></td>
+               <td><input id="station2Input" name="station2Input" type="text" maxlength="5" value="{{ch2['STATION']}}" required></td>
+               <td><input id="loc2Input" name="loc2Input" type="text" size="2" maxlength="2" minlength="2" value="{{ch2['LOC']}}"></td>
+               <td><input id="name2Input" name="name2Input" type="text" size="3" maxlength="3" minlength="3" value="{{ch2['NAME']}}" required></td>
                <td><input id="todisk2Input" name="todisk2Input" type="checkbox"></td>
                <td><input id="tonet2Input" name="tonet2Input" type="checkbox"></td>
                <td><input id="todisp2Input" name="todisp2Input" type="checkbox"></td>
            </tr>
            <tr>
                <td>3</td>
-               <td><input id="net3Input" name="net3Input" type="text" value={{ch3['NET']}}></td>
-               <td><input id="station3Input" name="station3Input" type="text" value={{ch3['STATION']}}></td>
-               <td><input id="loc3Input" name="loc3Input" type="text" value={{ch3['LOC']}}></td>
-               <td><input id="name3Input" name="name3Input" type="text" value={{ch3['NAME']}}></td>
+               <td><input id="net3Input" name="net3Input" type="text" maxlength="2" value="{{ch3['NET']}}"required></td>
+               <td><input id="station3Input" name="station3Input" type="text" maxlength="5"  value="{{ch3['STATION']}}" required></td>
+               <td><input id="loc3Input" name="loc3Input" type="text" size="2" maxlength="2" minlength="2" value="{{ch3['LOC']}}"></td>
+               <td><input id="name3Input" name="name3Input" type="text" size="3" maxlength="3" minlength="3" value="{{ch3['NAME']}}" required></td>
                <td><input id="todisk3Input" name="todisk3Input" type="checkbox"></td>
                <td><input id="tonet3Input" name="tonet3Input" type="checkbox"></td>
                <td><input id="todisp3Input" name="todisp3Input" type="checkbox"></td>
            </tr>
            <tr>
                <td>4</td>
-               <td><input id="net4Input" name="net4Input" type="text" value={{ch4['NET']}}></td>
-               <td><input id="station4Input" name="station4Input" type="text" value={{ch4['STATION']}}></td>
-               <td><input id="loc4Input" name="loc4Input" type="text" value={{ch4['LOC']}}></td>
-               <td><input id="name4Input" name="name4Input" type="text" value={{ch4['NAME']}}></td>
+               <td><input id="net4Input" name="net4Input" type="text" maxlength="2" value="{{ch4['NET']}}" required></td>
+               <td><input id="station4Input" name="station4Input" type="text" maxlength="5"  value="{{ch4['STATION']}}" required></td>
+               <td><input id="loc4Input" name="loc4Input" type="text" size="2" maxlength="2" minlength="2" value="{{ch4['LOC']}}"></td>
+               <td><input id="name4Input" name="name4Input" type="text" size="3" maxlength="3" minlength="3" value="{{ch4['NAME']}}" required></td>
                <td><input id="todisk4Input" name="todisk4Input" type="checkbox"></td>
                <td><input id="tonet4Input" name="tonet4Input" type="checkbox"></td>
                <td><input id="todisp4Input" name="todisp4Input" type="checkbox"></td>
            </tr>
            <tr>
                <td>5</td>
-               <td><input id="net5Input" name="net5Input" type="text" value={{ch5['NET']}}></td>
-               <td><input id="station5Input" name="station5Input" type="text" value={{ch5['STATION']}}></td>
-               <td><input id="loc5Input" name="loc5Input" type="text" value={{ch5['LOC']}}></td>
-               <td><input id="name5Input" name="name5Input" type="text" value={{ch5['NAME']}}></td>
+               <td><input id="net5Input" name="net5Input" type="text" maxlength="2" value="{{ch5['NET']}}" required></td>
+               <td><input id="station5Input" name="station5Input" type="text" maxlength="5" value="{{ch5['STATION']}}" required></td>
+               <td><input id="loc5Input" name="loc5Input" type="text" size="2" maxlength="2" minlength="2" value="{{ch5['LOC']}}"></td>
+               <td><input id="name5Input" name="name5Input" type="text" size="3" maxlength="3" minlength="3" value="{{ch5['NAME']}}" required></td>
                <td><input id="todisk5Input" name="todisk5Input" type="checkbox"></td>
                <td><input id="tonet5Input" name="tonet5Input" type="checkbox"></td>
                <td><input id="todisp5Input" name="todisp5Input" type="checkbox"></td>
            </tr>
            <tr style="background-color: rgb(250, 128, 114);">
                <td>6</td>
-               <td><input id="net6Input" name="net6Input" type="text" value={{ch5['NET']}}></td>
-               <td><input id="station6Input" name="station6Input" type="text" value={{ch5['STATION']}}></td>
-               <td><input id="loc6Input" name="loc6Input" type="text" value={{ch5['LOC']}}></td>
-               <td><input id="name6Input" name="name6Input" type="text" value={{ch5['NAME']}}></td>
+               <td><input id="net6Input" name="net6Input" type="text" maxlength="2" value="{{ch6['NET']}}" style="background-color: silver;"></td>
+               <td><input id="station6Input" name="station6Input" type="text" maxlength="5"  value="{{ch6['STATION']}}" style="background-color: silver;"></td>
+               <td><input id="loc6Input" name="loc6Input" type="text" size="2" maxlength="2" minlength="2" value="{{ch6['LOC']}}"></td>
+               <td><input id="name6Input" name="name6Input" type="text" size="3" maxlength="3" minlength="3" value="{{ch6['NAME']}}" required></td>
                <td><input id="todisk6Input" name="todisk6Input" type="checkbox"></td>
                <td><input id="tonet6Input" name="tonet6Input" type="checkbox"></td>
                <td><input id="todisp6Input" name="todisp6Input" type="checkbox"></td>
@@ -290,7 +307,7 @@
                         }        
                 </script>
             </td>
-            <td><input id="port0Input" name="port0Input" type="text" value={{soc0['PORT']}}></td>
+            <td><input id="port0Input" name="port0Input" type="number" min="1" max="65535" value="{{soc0['PORT']}}" required></td>
          </tr>
          <tr>
             <td>1</td>
@@ -311,7 +328,7 @@
                         }        
                     </script>
                 </td>
-            <td><input id="port1Input" name="port1Input" type="text" value={{soc1['PORT']}}></td>
+            <td><input id="port1Input" name="port1Input" type="number" min="1" max="65535"  value="{{soc1['PORT']}}" required></td>
          </tr>
          <tr>
             <td>2</td>
@@ -333,7 +350,7 @@
                         }        
                     </script>
             </td>
-            <td><input id="port2Input" name="port2Input" type="text" value={{soc2['PORT']}}></td>
+            <td><input id="port2Input" name="port2Input" type="number" min="1" max="65535" value="{{soc2['PORT']}}" required></td>
          </tr>
          <tr>
             <td>3</td>
@@ -354,7 +371,7 @@
                         }        
                     </script>
             </td>
-            <td><input id="port3Input" name="port3Input" type="text" value={{soc3['PORT']}}></td>
+            <td><input id="port3Input" name="port3Input" type="number" min="1" max="65535" value="{{soc3['PORT']}}" required></td>
          </tr>
        </table>
 
@@ -368,7 +385,7 @@
                  <td width="15%"><label for="dailyrebootInput">Daily Reboot</label></td>
                  <td width="15%" ><input id="dailyrebootInput" name="dailyrebootInput" type="checkbox"></td>
                  <td width="15%"><label for="reboottimeInput">Reboot Time</label></td>
-                 <td ><input id="reboottimeInput" name="reboottimeInput" type="text" value={{reboot['REBOOT_TIME']}} style="margin-left:10%;"></td>
+                 <td ><input id="reboottimeInput" name="reboottimeInput" type="text" pattern="([01]?[0-9]|2[0-3]):[0-5][0-9]" value="{{reboot['REBOOT_TIME']}}" style="margin-left:10%;"></td>
               </tr>
        
           </table>
@@ -378,9 +395,130 @@
 
 
 <script>
-   
+  $(document).ready(function(){
+     let ver="{{chooseVersion}}"
+     if (ver.length>0) {
+       let CheckedOption=document.querySelector("#{{chooseVersion}}")
+       CheckedOption.selected = true;
+     } 
+    });
+
+    function IsSubmit() {
+        document.querySelector("#isSend").checked=true
+        document.querySelector("#isAdd").checked=false
+        document.querySelector("#isDelete").checked=false
+        if (window.confirm("Do you want save new ini-file?")) {
+            console.log("yes")
+            $("#submit").click()
+        } else {
+            console.log("No")
+        }
+    }
+
+    function IsGetini() {
+        document.querySelector("#isSend").checked=false
+        document.querySelector("#isAdd").checked=false
+        document.querySelector("#isDelete").checked=false
+        if (window.confirm("Do you want get current ini-file from station?")) {
+            console.log("yes")
+            $("#submit").click()
+        } else {
+            console.log("No")
+        }
+    }
+
+    function IsAdd() {
+        document.querySelector("#isSend").checked=false
+        document.querySelector("#isAdd").checked=true
+        document.querySelector("#isDelete").checked=false
+        if (window.confirm("Do you want add new station?")) {
+            console.log("yes")
+            $("#add").click()
+            window.location.href = 'http://192.168.35.94:81/';
+        } else {
+            console.log("No")
+        }
+    }
+
+    function IsDelete() {
+        document.querySelector("#isSend").checked=false
+        document.querySelector("#isAdd").checked=false
+        document.querySelector("#isDelete").checked=true
+        if (window.confirm("Do you want delete current station?")) {
+            console.log("yes")
+            $("#delete").click()
+            window.location.href = 'http://192.168.35.94:81/';
+        } else {
+            console.log("No")
+        }
+    }
+$(document).ready(function(){
+     let ver="{{chooseVersion}}"
+     if (ver.length>0) {
+       let CheckedOption=document.querySelector("#{{chooseVersion}}")
+       CheckedOption.selected = true;
+     } 
+    });
+
+    function IsSubmit() {
+        document.querySelector("#isSend").checked=true
+        document.querySelector("#isAdd").checked=false
+        document.querySelector("#isDelete").checked=false
+        if (window.confirm("Do you want save new ini-file?")) {
+            console.log("yes")
+            $("#submit").click()
+        } else {
+            console.log("No")
+        }
+    }
+
+    function IsGetini() {
+        document.querySelector("#isSend").checked=false
+        document.querySelector("#isAdd").checked=false
+        document.querySelector("#isDelete").checked=false
+        if (window.confirm("Do you want get current ini-file from station?")) {
+            console.log("yes")
+            $("#submit").click()
+        } else {
+            console.log("No")
+        }
+    }
+
+    function IsAdd() {
+        document.querySelector("#isSend").checked=false
+        document.querySelector("#isAdd").checked=true
+        document.querySelector("#isDelete").checked=false
+        if (window.confirm("Do you want add new station?")) {
+            console.log("yes")
+            $("#add").click()
+            //window.location.href = 'http://192.168.35.94:81/';
+        } else {
+            console.log("No")
+        }
+    }
+
+    function IsDelete() {
+        document.querySelector("#isSend").checked=false
+        document.querySelector("#isAdd").checked=false
+        document.querySelector("#isDelete").checked=true
+        if (window.confirm("Do you want delete current station?")) {
+            console.log("yes")
+            $("#delete").click()
+            //window.location.href = 'http://192.168.35.94:81/';
+        } else {
+            console.log("No")
+        }
+    }
+
+
     if ({{stat['AUTO']}}==1) {
       document.getElementById("autoInput").checked=true
+    }
+     if ({{stat['GAIN']}}==1) {
+      document.getElementById("gainInput").checked=true
+    }
+    if ({{stat['SENS_POW']}}==1) {
+      document.getElementById("senspowInput").checked=true
     }
     if ({{net['ETH_POW']}}==1) {
       document.getElementById("ethpowInput").checked=true
@@ -451,13 +589,13 @@
     if ({{reboot['DAILY_REBOOT']}}==1) {
       document.getElementById("dailyrebootInput").checked=true
     }
-     if ({{ch5['TO_DISK']}}==1) {
+     if ({{ch6['TO_DISK']}}==1) {
       document.getElementById("todisk6Input").checked=true
     }
-    if ({{ch5['TO_NET']}}==1) {
+    if ({{ch6['TO_NET']}}==1) {
       document.getElementById("tonet6Input").checked=true
     }
-    if ({{ch5['TO_DISP']}}==1) {
+    if ({{ch6['TO_DISP']}}==1) {
       document.getElementById("todisp6Input").checked=true
     }
     
@@ -465,31 +603,8 @@
         window.location.href = $(this).val();
     });
 
-    $(document).ready(function(){
-     let ver="{{chooseVersion}}"
-     if (ver.length>0) {
-       let CheckedOption=document.querySelector("#{{chooseVersion}}")
-       CheckedOption.selected = true;
-     } 
-    });
-
-    function IsSubmit() {
-        if (window.confirm("Do you want save new ini-file?")) {
-            console.log("yes")
-            $("#submit").click()
-        } else {
-            console.log("No")
-        }
-    }
-
-    function IsGetini() {
-        if (window.confirm("Do you want get current ini-file from station?")) {
-            console.log("yes")
-            //$("#submit").click()
-        } else {
-            console.log("No")
-        }
-    }
+    
+   
     
     
 </script>
