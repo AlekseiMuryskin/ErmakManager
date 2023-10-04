@@ -55,7 +55,7 @@
         width:70%;
     }
     input[type="number"] {
-        width: 100%;
+        width: 80%;
     }
     
    </style>
@@ -91,6 +91,7 @@
                     <input id="isAdd" name="isAdd" type="checkbox" style="display:none;"/>
                     <input id="isDelete" name="isDelete" type="checkbox" style="display:none;"/>
                 </div>
+                <hr>
                 <fieldset>
                 <h4>System</h4>
                 <table width="100%">
@@ -103,9 +104,9 @@
                     <th></th>
                 </tr>
                <tr>
-                    <td width="13%"><label for="deviceInput">Device Name</label></td>
+                    <td width="10%"><label for="deviceInput">Device Name</label></td>
                     <td width="23%"><input id="deviceInput" name="deviceInput" type="text" maxlength="32" value="{{stat['device_name']}}" required></td>
-                    <td width="10%"><label for="samprateInput">Samprate</label></td>
+                    <td width="8%"><label for="samprateInput">Samprate</label></td>
                     <td width="23%"><input id="samprateInput" name="samprateInput"  type="number" max="2000" min="10" step="10" value="{{stat['samprate']}}" required></td>
                     <td width="8%"><label for="lcdInput">LCD on time</label></td>
                     <td><input id="lcdInput" name="lcdInput" type="number" min="1" max="255" value="{{stat['LCD_ON_TIME']}}" required></td>
@@ -118,7 +119,7 @@
                     <td><label for="slowrecInput">Slow rec interval</label></td>
                     <td><input id="slowrecInput" name="slowrecInput" type="number" min="0" max="4294967296" value="{{stat['SLOW_REC_INTERVAL']}}" required></td>
                 <tr>
-                    <td><label for="gainInput">Gain</label></td>
+                    <td><label for="gainInput">High Gain</label></td>
                     <td><input id="gainInput" name="gainInput" type="checkbox"></td>
                     <td><label for="senspowInput">Sens pow</label></td>
                     <td><input id="senspowInput" name="senspowInput" type="checkbox"></td>
@@ -127,6 +128,7 @@
                </tr>
            </table>
        </fieldset>
+       <hr>
        <fieldset>
          <h4>NET</h4>
           <table width="100%">
@@ -139,9 +141,9 @@
                     <th></th>
                 </tr>
               <tr>
-                 <td width="13%"><label for="ethpowInput">ETH pow</label></td>
+                 <td width="10%"><label for="ethpowInput">ETH pow</label></td>
                  <td width="23%"><input id="ethpowInput" name="ethpowInput" type="checkbox" ></td>
-                 <td width="10%"><label for="dslpowInput">DSL pow</label></td>
+                 <td width="8%"><label for="dslpowInput">DSL pow</label></td>
                  <td width="23%"><input id="dslpowInput" name="dslpowInput" type="checkbox" ></td>
               </tr>
               <tr>
@@ -149,12 +151,13 @@
                   <td><input id="ethipInput" name="ethipInput" type="text" value="{{net['ETH_IP']}}" readonly></td>
                   <td><label for="ethmaskInput">Mask</label></td>
                   <td><input id="ethmaskInput" name="ethmaskInput" type="text"  pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" value="{{net['ETH_MASK']}}" required></td>
-                  <td width="8%"><label for="ethgwInput">GW</label></td>
-                  <td><input id="ethgwInput" name="ethgwInput" type="text"  pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" value="{{net['ETH_GW']}}" required></td>
+                  <td width="8%" style="text-align:right;padding-right:1%;"><label for="ethgwInput">GW</label></td>
+                  <td><input id="ethgwInput" style="width:80%;" name="ethgwInput" type="text"  pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" value="{{net['ETH_GW']}}" required></td>
               </tr>
 
           </table>
        </fieldset>
+       <hr>
        <fieldset>
          <h4>Time</h4>
           <table width="100%">
@@ -167,7 +170,7 @@
                     <th></th>
                 </tr>
               <tr>
-                 <td width="13%"><label for="sourceInput">Source</label></td>
+                 <td width="10%"><label for="sourceInput">Source</label></td>
                  <td width="23%">
                     
                     <select id="sourceInput" name="sourceInput">
@@ -186,9 +189,9 @@
                         
                     </script>
                 </td>
-                 <td width="9%"><label for="ntpipInput">NTP IP</label></td>
+                 <td width="8%"><label for="ntpipInput">NTP IP</label></td>
                  <td width="23%"><input id="ntpipInput" name="ntpipInput" type="text"  pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" value="{{time['NTP_IP']}}" ></td>
-                 <td width="7%"><label for="ntpportInput">NTP Port</label></td>
+                 <td width="8%"><label for="ntpportInput">NTP Port</label></td>
                  <td><input id="ntpportInput" name="ntpportInput" type="number" min="1" max="65535" value="{{time['NTP_PORT']}}" ></td>
               </tr>
               <tr>
@@ -391,6 +394,7 @@
           </table>
        </fieldset>
             </form>
+            <hr>
         </div>
 
 
