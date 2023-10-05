@@ -57,15 +57,24 @@
     input[type="number"] {
         width: 80%;
     }
+    td label {
+        text-align: right;
+    }
+    td.label {
+        text-align: right;
+    }
     
    </style>
 
     <h1>{% block title %}  {% endblock %}</h1>
     
-        <a href="#">
-            <h2>Ermak Manager</h2>
-            <h5>{{chooseSta}}</h5>
-        </a>
+        <a href="#"><h2>Ermak Manager</h2></a>
+
+        {% if hasSta %}
+            <a href="http://{{net['ETH_IP']}}/status" target="_blank" style="display:inline-block;"><h5>{{chooseSta}}</h5></a>
+            <button class="btn btn-primary btn-sm" onclick="Rename()" type="button" style="display:inline-block;">Rename</button>
+        {% endif %}
+
         <span class="badge badge-primary"></span>
         <hr>
         <div>
@@ -86,11 +95,11 @@
             <form method="post">
                 <div> 
                     <button id="submit" type="submit" class="btn btn-primary" style="display:none;">Submit</button>
-                    <button id="add" type="submit" class="btn btn-primary" style="display:none;">Add</button>
                     <button id="delete" type="submit" class="btn btn-primary" style="display:none;">Delete</button>
                     <input id="isSend" name="isSend" type="checkbox" style="display:none;"/>
-                    <input id="isAdd" name="isAdd" type="checkbox" style="display:none;"/>
                     <input id="isDelete" name="isDelete" type="checkbox" style="display:none;"/>
+                    <input id="isRename" name="isRename" type="checkbox" style="display:none;"/>
+                    <input id="newNameSta" name="newNameSta" type="text" style="display:none;"/>
                 </div>
                 <hr>
                 <fieldset>
@@ -105,26 +114,26 @@
                     <th></th>
                 </tr>
                <tr>
-                    <td width="10%"><label for="deviceInput">Device Name</label></td>
-                    <td width="23%"><input id="deviceInput" name="deviceInput" type="text" maxlength="32" value="{{stat['device_name']}}" required></td>
-                    <td width="8%"><label for="samprateInput">Samprate</label></td>
+                    <td width="10%" class="label"><label for="deviceInput">Device Name</label></td>
+                    <td width="23%"><input id="deviceInput" name="deviceInput" type="text" maxlength="32" style="width:80%;" value="{{stat['device_name']}}" required></td>
+                    <td width="8%" class="label"><label for="samprateInput">Samprate</label></td>
                     <td width="23%"><input id="samprateInput" name="samprateInput"  type="number" max="2000" min="10" step="10" value="{{stat['samprate']}}" required></td>
-                    <td width="8%"><label for="lcdInput">LCD on time</label></td>
+                    <td width="8%" class="label"><label for="lcdInput">LCD on time</label></td>
                     <td><input id="lcdInput" name="lcdInput" type="number" min="1" max="255" value="{{stat['LCD_ON_TIME']}}" required></td>
                </tr>
                <tr> 
-                    <td><label for="tempInput">Temp mes int</label></td>
+                    <td class="label"><label for="tempInput">Temp mes int</label></td>
                     <td><input id="tempInput" name="tempInput" type="number" min="60" max="65535" value="{{stat['TEMP_MES_INT']}}" required></td>
-                    <td><label for="lenInput">File len</label></td>
+                    <td class="label"><label for="lenInput">File len</label></td>
                     <td><input id="lenInput" name="lenInput" type="number" value="{{stat['LEN']}}"></td>
-                    <td><label for="slowrecInput">Slow rec interval</label></td>
+                    <td class="label"><label for="slowrecInput">Slow rec interval</label></td>
                     <td><input id="slowrecInput" name="slowrecInput" type="number" min="0" max="4294967296" value="{{stat['SLOW_REC_INTERVAL']}}" required></td>
                 <tr>
-                    <td><label for="gainInput">High Gain</label></td>
+                    <td class="label"><label for="gainInput">High Gain</label></td>
                     <td><input id="gainInput" name="gainInput" type="checkbox"></td>
-                    <td><label for="senspowInput">Sens pow</label></td>
+                    <td class="label"><label for="senspowInput">Sens pow</label></td>
                     <td><input id="senspowInput" name="senspowInput" type="checkbox"></td>
-                    <td><label for="autoInput">Auto Start</label></td>
+                    <td class="label"><label for="autoInput">Auto Start</label></td>
                     <td><input id="autoInput" name="autoInput" type="checkbox" style="margin-left:4%;" ></td>
                </tr>
            </table>
@@ -142,17 +151,17 @@
                     <th></th>
                 </tr>
               <tr>
-                 <td width="10%"><label for="ethpowInput">ETH pow</label></td>
+                 <td width="10%" class="label"><label for="ethpowInput">ETH pow</label></td>
                  <td width="23%"><input id="ethpowInput" name="ethpowInput" type="checkbox" ></td>
-                 <td width="8%"><label for="dslpowInput">DSL pow</label></td>
+                 <td width="8%" class="label"><label for="dslpowInput">DSL pow</label></td>
                  <td width="23%"><input id="dslpowInput" name="dslpowInput" type="checkbox" ></td>
               </tr>
               <tr>
-                  <td><label for="ethipInput">IP</label></td>
+                  <td class="label"><label for="ethipInput">IP</label></td>
                   <td><input id="ethipInput" name="ethipInput" type="text" value="{{net['ETH_IP']}}" readonly></td>
-                  <td><label for="ethmaskInput">Mask</label></td>
+                  <td class="label"><label for="ethmaskInput">Mask</label></td>
                   <td><input id="ethmaskInput" name="ethmaskInput" type="text"  pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" value="{{net['ETH_MASK']}}" required></td>
-                  <td width="8%" style="text-align:right;padding-right:1%;"><label for="ethgwInput">GW</label></td>
+                  <td class="label" width="8%" style="text-align:right;padding-right:1%;"><label for="ethgwInput">GW</label></td>
                   <td><input id="ethgwInput" style="width:80%;" name="ethgwInput" type="text"  pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" value="{{net['ETH_GW']}}" required></td>
               </tr>
 
@@ -171,7 +180,7 @@
                     <th></th>
                 </tr>
               <tr>
-                 <td width="10%"><label for="sourceInput">Source</label></td>
+                 <td width="10%" class="label"><label for="sourceInput">Source</label></td>
                  <td width="23%">
                     
                     <select id="sourceInput" name="sourceInput">
@@ -190,13 +199,13 @@
                         
                     </script>
                 </td>
-                 <td width="8%"><label for="ntpipInput">NTP IP</label></td>
+                 <td width="8%" class="label"><label for="ntpipInput">NTP IP</label></td>
                  <td width="23%"><input id="ntpipInput" name="ntpipInput" type="text"  pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" value="{{time['NTP_IP']}}" ></td>
-                 <td width="8%"><label for="ntpportInput">NTP Port</label></td>
+                 <td width="8%" class="label"><label for="ntpportInput">NTP Port</label></td>
                  <td><input id="ntpportInput" name="ntpportInput" type="number" min="1" max="65535" value="{{time['NTP_PORT']}}" ></td>
               </tr>
               <tr>
-                  <td><label for="gpssleepInput">GPS Sleep time</label></td>
+                  <td class="label"><label for="gpssleepInput">GPS Sleep time</label></td>
                   <td><input id="gpssleepInput" name="gpssleepInput" type="number" min="0" max="65535" value="{{time['GPS_SLEEP_TIME']}}"></td>
               </tr>
 
@@ -386,9 +395,9 @@
          <h4>Reboot</h4>
           <table>
               <tr>
-                 <td width="15%"><label for="dailyrebootInput">Daily Reboot</label></td>
+                 <td width="15%" class="label"><label for="dailyrebootInput">Daily Reboot</label></td>
                  <td width="15%" ><input id="dailyrebootInput" name="dailyrebootInput" type="checkbox"></td>
-                 <td width="15%"><label for="reboottimeInput">Reboot Time</label></td>
+                 <td width="15%" class="label"><label for="reboottimeInput">Reboot Time</label></td>
                  <td ><input id="reboottimeInput" name="reboottimeInput" type="text" pattern="([01]?[0-9]|2[0-3]):[0-5][0-9]" value="{{reboot['REBOOT_TIME']}}" style="margin-left:10%;"></td>
               </tr>
        
@@ -398,9 +407,6 @@
             <hr>
         </div>
 
-
-
-
 <script>
   $(document).ready(function(){
      let ver="{{chooseVersion}}"
@@ -409,12 +415,35 @@
        CheckedOption.selected = true;
      } 
     });
-
+    
+    function Rename() {
+        document.querySelector("#isSend").checked=false
+        document.querySelector("#isDelete").checked=false
+        document.querySelector("#isRename").checked=true
+        let regex = /^[^\s^\x00-\x1f\\?*:"";<>|\/.][^\x00-\x1f\\?*:"";<>|\/]*[^\s^\x00-\x1f\\?*:"";<>|\/.]+$/
+        let newName=window.prompt("New Name:")
+        let stations=[]
+        let curSta=""
+        let navBar=document.querySelectorAll("#navBar li")
+        navBar.forEach((elem)=>{
+            curSta=elem.innerText.slice(0,-2)
+            stations.push(curSta)
+            //console.log(curSta)
+        })
+        if (!regex.test(newName)) {
+             window.alert("Incorrect name for the station")
+        } else if (stations.includes(newName)) {
+            window.alert("The entered name has already been used")
+        } else {
+            document.querySelector("#newNameSta").value=newName
+            $("#submit").click()
+        }
+    }
 
     function IsSubmit() {
         document.querySelector("#isSend").checked=true
-        document.querySelector("#isAdd").checked=false
         document.querySelector("#isDelete").checked=false
+        document.querySelector("#isRename").checked=false
         if (window.confirm("Do you want save new ini-file?")) {
             console.log("yes")
             $("#submit").click()
@@ -425,8 +454,8 @@
 
     function IsGetini() {
         document.querySelector("#isSend").checked=false
-        document.querySelector("#isAdd").checked=false
         document.querySelector("#isDelete").checked=false
+        document.querySelector("#isRename").checked=false
         if (window.confirm("Do you want get current ini-file from station?")) {
             console.log("yes")
             $("#submit").click()
@@ -435,22 +464,10 @@
         }
     }
 
-    function IsAdd() {
-        document.querySelector("#isSend").checked=false
-        document.querySelector("#isAdd").checked=true
-        document.querySelector("#isDelete").checked=false
-        if (window.confirm("Do you want add new station?")) {
-            console.log("yes")
-            //$("#add").click()
-            //window.location.href = 'http://192.168.35.94:81/';
-        } else {
-            console.log("No")
-        }
-    }
 
     function IsDelete() {
         document.querySelector("#isSend").checked=false
-        document.querySelector("#isAdd").checked=false
+        document.querySelector("#isRename").checked=false
         document.querySelector("#isDelete").checked=true
         if (window.confirm("Do you want delete current station?")) {
             console.log("yes")

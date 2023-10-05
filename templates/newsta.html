@@ -61,17 +61,13 @@
    </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     
-        <a href="#">
-            <h2>Ermak Manager</h2>
-            <h5>{{chooseSta}}</h5>
-             {% if chooseSta %}
-                <button>Rename</button>
-            {% endif %}
-        </a>
+        <a><h2>Ermak Manager</h2></a>
+        
+        
         <span class="badge badge-primary"></span>
         <hr>  
         <div>
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
                 <div> 
                     <button id="submit" type="submit" class="btn btn-primary" style="display:none;">Submit</button>
                     <button id="add" type="submit" class="btn btn-primary" style="display:none;">Add</button>
@@ -89,14 +85,24 @@
                   </tr>
                   <tr>
                     <td><label for="newName">New Station:</label></td>
-                    <td><input id="newName" name="newName" type="text" oninput='this.value=this.value.replace(/[^\w\d]*/gi,"");'></td>
+                    <td><input id="newName" name="newName" type="text"></td>
                     <td><label for="newIP">IP:</label></td>
                     <td><input id="newIP" name="newIP" type="text" pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$"></td>
                   </tr>
                   <tr>
                       <td style="padding-top:3%;">
-                          <button id="btnCreate" type="button" onclick="IsAddSta()" class="btn btn-primary">Create</button>
+                          <button id="btnCreate" type="button" onclick="AddSta()" class="btn btn-primary">Create</button>
+                      </td>
+                      <td style="padding-top:3%;">
+                          <button id="btnLoad" type="button" onclick="Load()" class="btn btn-primary">Load INI</button>
                           <button id="btnSubmit" type="submit" class="btn btn-primary" style="display:none;">Submit</button>
+                      </td>
+                  </tr>
+                  <tr>
+                      <td colspan="4">
+                          <input id="file" name="file" style="display:none;" type="file">
+                          <input id="isErmak" name="isErmak" type="checkbox" style="display:none;"/>
+                          <input id="isINI" name="isINI" type="checkbox" style="display:none;"/>
                       </td>
                   </tr>
                   <tr style="height: 300px;">
@@ -112,8 +118,40 @@
 
 <script>
  
-    
-    function IsAddSta() {
+    function Load() {
+       document.querySelector("#isErmak").checked=false
+       document.querySelector("#isINI").checked=true
+       let regex = /^[^\s^\x00-\x1f\\?*:"";<>|\/.][^\x00-\x1f\\?*:"";<>|\/]*[^\s^\x00-\x1f\\?*:"";<>|\/.]+$/
+       let newSta=document.querySelector("#newName").value
+       if (newSta.length == 0) {
+            window.alert("Write the name of the new station")
+        } else if (!regex.test(newSta)) {
+            window.alert("Incorrect name for the station")
+        } else {
+            let stations=[]
+            let curSta=""
+            let navBar=document.querySelectorAll("#navBar li")
+            navBar.forEach((elem)=>{
+                curSta=elem.innerText.slice(0,-2)
+                stations.push(curSta)
+                //console.log(curSta)
+            })
+            if (stations.includes(newSta)) {
+                window.alert("The entered name has already been used")
+            } else {
+                $("#file").click()
+            }
+        }
+    }
+
+    $("#file").on('change',(e)=>{
+         $("#btnSubmit").click()
+    })
+
+    function AddSta() {
+        document.querySelector("#isErmak").checked=true
+        document.querySelector("#isINI").checked=false
+        let regex = /^[^\s^\x00-\x1f\\?*:"";<>|\/.][^\x00-\x1f\\?*:"";<>|\/]*[^\s^\x00-\x1f\\?*:"";<>|\/.]+$/
         let newSta=document.querySelector("#newName").value
         let newIP=document.querySelector("#newIP").value
        
@@ -121,12 +159,14 @@
             window.alert("Write the name of the new station")
         } else if (newIP.length == 0){ 
             window.alert("Write the IP of the new station")
+        } else if (!regex.test(newSta)) {
+            window.alert("Incorrect name for the station")
         } else {
             let stations=[]
             let curSta=""
             let navBar=document.querySelectorAll("#navBar li")
             navBar.forEach((elem)=>{
-                curSta=elem.innerText.split(" ")[0]
+                curSta=elem.innerText.slice(0,-2)
                 stations.push(curSta)
                 //console.log(curSta)
             })
@@ -141,22 +181,9 @@
     }
 
 
-    function IsAdd() {
-        document.querySelector("#isSend").checked=false
-        document.querySelector("#isAdd").checked=true
-        document.querySelector("#isDelete").checked=false
-        if (window.confirm("Do you want add new station?")) {
-            console.log("yes")
-            //$("#add").click()
-            //window.location.href = 'http://192.168.35.94:81/';
-        } else {
-            console.log("No")
-        }
-    }
 
     function IsDelete() {
         document.querySelector("#isSend").checked=false
-        document.querySelector("#isAdd").checked=false
         document.querySelector("#isDelete").checked=true
         if (window.confirm("Do you want delete current station?")) {
             console.log("yes")
