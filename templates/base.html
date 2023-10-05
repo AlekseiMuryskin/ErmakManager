@@ -16,12 +16,12 @@
   <body>
     <table>
       <tr>
-        <td width="20%" valign="top">
-          <div style="padding:10%;padding-top:70%;"> 
+        <td width="200px" valign="top">
+          <div style="padding:10%;padding-top:65%;padding-right:2%;"> 
             <button class="btn btn-primary" onclick="window.location.href = 'http://192.168.35.94:81/newsta'">Add</button>
             <button onclick="IsDelete()" class="btn btn-primary">Delete</button>
             <nav>
-               <ul>
+               <ul id="navBar">
                 {% block navigate%} {%endblock%}
               </ul>
             </nav>

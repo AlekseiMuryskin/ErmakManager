@@ -1,6 +1,6 @@
 import configparser
 import os
-from flask import Flask, request
+from flask import Flask, request, redirect
 from flask import render_template
 from configparser import ConfigParser
 import shutil
@@ -55,12 +55,23 @@ def index():
                            soc0=socket0, soc1=socket1, soc2=socket2, soc3=socket3, reboot=reboot,
                            ch0=ch0, ch1=ch1, ch2=ch2, ch3=ch3, ch4=ch4, ch5=ch5,ch6=ch6, version_list=flist, statusCodes=statusCodes)
 
-@app.route('/newsta')
+@app.route('/newsta', methods=["GET","POST"])
 def newStation():
     pth="./ini/"
     dirlist=os.listdir(pth)
     statusCodes=getStatusCode(dirlist)
     chooseSta = ""
+    if request.method == "POST":
+        newName=request.form.get("newName")
+        newIP=request.form.get("newIP")
+        try:
+            os.mkdir(pth+newName)
+            cmd = f"tftp.exe -i -v {newIP} get seisview_imp.ini"
+            os.system(cmd)
+            shutil.move("seisview_imp.ini",f"{pth+newName+'/seisview_imp.ini'}")
+            return redirect(f'/{newName}/last')
+        except:
+            return "Sorry! The station is off-line."
     return render_template('newsta.html',  station=dirlist, statusCodes=statusCodes, chooseSta=chooseSta)
 
 
@@ -598,30 +609,7 @@ def stationProp(station,version):
             pth = "./ini/"
             shutil.rmtree(pth + station)
             dirlist = os.listdir(pth)
-            statusCodes = getStatusCode(dirlist)
-            stat = {}
-            net = {}
-            time = {}
-            socket0 = {}
-            socket1 = {}
-            socket2 = {}
-            socket3 = {}
-            ch0 = {}
-            ch1 = {}
-            ch2 = {}
-            ch3 = {}
-            ch4 = {}
-            ch5 = {}
-            ch6 = {}
-            reboot = {}
-            chooseSta = ""
-            chooseVersion = ""
-            flist = {}
-            return render_template('index.html', station=dirlist, chooseSta=chooseSta, chooseVersion=chooseVersion,
-                                   stat=stat, net=net, time=time,
-                                   soc0=socket0, soc1=socket1, soc2=socket2, soc3=socket3, reboot=reboot,
-                                   ch0=ch0, ch1=ch1, ch2=ch2, ch3=ch3, ch4=ch4, ch5=ch5, ch6=ch6, version_list=flist,
-                                   statusCodes=statusCodes)
+            return redirect("/")
 
 
         else:
@@ -629,8 +617,9 @@ def stationProp(station,version):
             with open(pth + station + "/seisview_imp_v" + str(ver) + ".ini", "w") as file_object:
                 new_inifile.write(file_object)
             try:
-                cmd = f"tftp.exe -i -v {net['ETH_IP']} get {pth + station + '/seisview_imp.ini'}"
+                cmd = f"tftp.exe -i -v {net['ETH_IP']} get seisview_imp.ini"
                 os.system(cmd)
+                shutil.move("seisview_imp.ini",f"{pth + station + '/seisview_imp.ini'}")
                 #destination = pth + station + "/seisview_imp.ini"
                 #url = f"http://{net['ETH_IP']}/seisview_imp.ini"
                 #urllib.request.urlretrieve(url, destination)
