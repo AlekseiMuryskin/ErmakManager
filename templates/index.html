@@ -44,6 +44,7 @@
     .tb2 td {
         border: 1px solid black;
         text-align: center;
+
     }
     .tb2 {
         border:1px solid black;
@@ -53,6 +54,7 @@
     .tb2 input {
         box-sizing: border-box;
         width:70%;
+        min-width:40px;
     }
     input[type="number"] {
         width: 80%;
@@ -115,19 +117,19 @@
                 </tr>
                <tr>
                     <td width="10%" class="label"><label for="deviceInput">Device Name</label></td>
-                    <td width="23%"><input id="deviceInput" name="deviceInput" type="text" maxlength="32" style="width:80%;" value="{{stat['device_name']}}" required></td>
+                    <td width="23%"><input id="deviceInput" name="deviceInput" type="text" maxlength="32" style="width:80%;min-width:140px;" value="{{stat['device_name']}}" required></td>
                     <td width="8%" class="label"><label for="samprateInput">Samprate</label></td>
-                    <td width="23%"><input id="samprateInput" name="samprateInput"  type="number" max="2000" min="10" step="10" value="{{stat['samprate']}}" required></td>
+                    <td width="12%"><input id="samprateInput" name="samprateInput"  type="number" max="2000" min="10" step="10" style="min-width:55px;" value="{{stat['samprate']}}" required></td>
                     <td width="8%" class="label"><label for="lcdInput">LCD on time</label></td>
-                    <td><input id="lcdInput" name="lcdInput" type="number" min="1" max="255" value="{{stat['LCD_ON_TIME']}}" required></td>
+                    <td width="12%"><input id="lcdInput" name="lcdInput" type="number" min="1" max="255" value="{{stat['LCD_ON_TIME']}}" style="min-width:55px;" required></td>
                </tr>
                <tr> 
                     <td class="label"><label for="tempInput">Temp mes int</label></td>
-                    <td><input id="tempInput" name="tempInput" type="number" min="60" max="65535" value="{{stat['TEMP_MES_INT']}}" required></td>
+                    <td><input id="tempInput" name="tempInput" type="number" min="60" max="65535" value="{{stat['TEMP_MES_INT']}}" style="min-width:55px;" required></td>
                     <td class="label"><label for="lenInput">File len</label></td>
-                    <td><input id="lenInput" name="lenInput" type="number" value="{{stat['LEN']}}"></td>
+                    <td><input id="lenInput" name="lenInput" type="number" style="min-width:65px;" value="{{stat['LEN']}}"></td>
                     <td class="label"><label for="slowrecInput">Slow rec interval</label></td>
-                    <td><input id="slowrecInput" name="slowrecInput" type="number" min="0" max="4294967296" value="{{stat['SLOW_REC_INTERVAL']}}" required></td>
+                    <td><input id="slowrecInput" name="slowrecInput" type="number" min="0" style="min-width:55px;" max="4294967296" value="{{stat['SLOW_REC_INTERVAL']}}" required></td>
                 <tr>
                     <td class="label"><label for="gainInput">High Gain</label></td>
                     <td><input id="gainInput" name="gainInput" type="checkbox"></td>
@@ -158,11 +160,11 @@
               </tr>
               <tr>
                   <td class="label"><label for="ethipInput">IP</label></td>
-                  <td><input id="ethipInput" name="ethipInput" type="text" value="{{net['ETH_IP']}}" readonly></td>
+                  <td><input id="ethipInput" name="ethipInput" type="text" value="{{net['ETH_IP']}}" style="width:70%;min-width:120px;" readonly></td>
                   <td class="label"><label for="ethmaskInput">Mask</label></td>
-                  <td><input id="ethmaskInput" name="ethmaskInput" type="text"  pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" value="{{net['ETH_MASK']}}" required></td>
+                  <td><input id="ethmaskInput" name="ethmaskInput" type="text"  style="width:80%;min-width:120px;" pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" value="{{net['ETH_MASK']}}"  required></td>
                   <td class="label" width="8%" style="text-align:right;padding-right:1%;"><label for="ethgwInput">GW</label></td>
-                  <td><input id="ethgwInput" style="width:80%;" name="ethgwInput" type="text"  pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" value="{{net['ETH_GW']}}" required></td>
+                  <td><input id="ethgwInput" style="width:70%;min-width:120px;" name="ethgwInput" type="text" pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" value="{{net['ETH_GW']}}" required></td>
               </tr>
 
           </table>
@@ -181,7 +183,7 @@
                 </tr>
               <tr>
                  <td width="10%" class="label"><label for="sourceInput">Source</label></td>
-                 <td width="23%">
+                 <td width="13%">
                     
                     <select id="sourceInput" name="sourceInput">
                         <option value="0">ext gps</option>
@@ -199,10 +201,10 @@
                         
                     </script>
                 </td>
-                 <td width="8%" class="label"><label for="ntpipInput">NTP IP</label></td>
-                 <td width="23%"><input id="ntpipInput" name="ntpipInput" type="text"  pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" value="{{time['NTP_IP']}}" ></td>
+                 <td style="width:12%;" class="label"><label for="ntpipInput">NTP IP</label></td>
+                 <td><input id="ntpipInput" name="ntpipInput" type="text" style="width:60%;min-width:120px;"  pattern="^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$" value="{{time['NTP_IP']}}" ></td>
                  <td width="8%" class="label"><label for="ntpportInput">NTP Port</label></td>
-                 <td><input id="ntpportInput" name="ntpportInput" type="number" min="1" max="65535" value="{{time['NTP_PORT']}}" ></td>
+                 <td><input id="ntpportInput" name="ntpportInput" type="number" min="1" max="65535" style="min-width:80px;" value="{{time['NTP_PORT']}}" ></td>
               </tr>
               <tr>
                   <td class="label"><label for="gpssleepInput">GPS Sleep time</label></td>
@@ -214,11 +216,11 @@
 
        <table class="tb2">
            <tr>
-             <th>Ch</th>
-             <th>Network</th>
-             <th>Station</th>
+             <th>#</th>
+             <th>Net</th>
+             <th>St</th>
              <th>LC</th>
-             <th>Channel</th>
+             <th>Ch</th>
              <th>To disk</th>
              <th>To net</th>
              <th>To display</th>
@@ -226,7 +228,7 @@
            <tr>
                <td width="5%">0</td>
                <td width="15%"><input id="net0Input" name="net0Input" maxlength="2" type="text" value="{{ch0['NET']}}" required></td>
-               <td width="15%"><input id="station0Input" name="station0Input" maxlength="5" type="text" value="{{ch0['STATION']}}" required></td>
+               <td width="15%"><input id="station0Input" name="station0Input" maxlength="5" style="min-width:50px;" type="text" value="{{ch0['STATION']}}" required></td>
                <td width="15%"><input id="loc0Input" name="loc0Input" type="text" size="2" maxlength="2" minlength="2" value="{{ch0['LOC']}}"></td>
                <td width="15%"><input id="name0Input" name="name0Input" type="text" size="3" maxlength="3" minlength="3" value="{{ch0['NAME']}}" required></td>
                <td><input id="todisk0Input" name="todisk0Input" type="checkbox"></td>
@@ -236,7 +238,7 @@
            <tr>
                <td>1</td>
                <td><input id="net1Input" name="net1Input" type="text" maxlength="2" value="{{ch1['NET']}}" required></td>
-               <td><input id="station0Input" name="station1Input" type="text" maxlength="5"  value="{{ch1['STATION']}}" required></td>
+               <td><input id="station0Input" name="station1Input" type="text" maxlength="5" style="min-width:50px;"  value="{{ch1['STATION']}}" required></td>
                <td><input id="loc1Input" name="loc1Input" type="text" size="2" maxlength="2" minlength="2" value="{{ch1['LOC']}}"></td>
                <td><input id="name1Input" name="name1Input" type="text" size="3" maxlength="3" minlength="3" value="{{ch1['NAME']}}" required></td>
                <td><input id="todisk1Input" name="todisk1Input" type="checkbox"></td>
@@ -245,7 +247,7 @@
            <tr>
                <td>2</td>
                <td><input id="net2Input" name="net2Input" type="text" maxlength="2" value="{{ch2['NET']}}" required></td>
-               <td><input id="station2Input" name="station2Input" type="text" maxlength="5" value="{{ch2['STATION']}}" required></td>
+               <td><input id="station2Input" name="station2Input" type="text" maxlength="5" style="min-width:50px;" value="{{ch2['STATION']}}" required></td>
                <td><input id="loc2Input" name="loc2Input" type="text" size="2" maxlength="2" minlength="2" value="{{ch2['LOC']}}"></td>
                <td><input id="name2Input" name="name2Input" type="text" size="3" maxlength="3" minlength="3" value="{{ch2['NAME']}}" required></td>
                <td><input id="todisk2Input" name="todisk2Input" type="checkbox"></td>
@@ -255,7 +257,7 @@
            <tr>
                <td>3</td>
                <td><input id="net3Input" name="net3Input" type="text" maxlength="2" value="{{ch3['NET']}}"required></td>
-               <td><input id="station3Input" name="station3Input" type="text" maxlength="5"  value="{{ch3['STATION']}}" required></td>
+               <td><input id="station3Input" name="station3Input" type="text" maxlength="5" style="min-width:50px;"  value="{{ch3['STATION']}}" required></td>
                <td><input id="loc3Input" name="loc3Input" type="text" size="2" maxlength="2" minlength="2" value="{{ch3['LOC']}}"></td>
                <td><input id="name3Input" name="name3Input" type="text" size="3" maxlength="3" minlength="3" value="{{ch3['NAME']}}" required></td>
                <td><input id="todisk3Input" name="todisk3Input" type="checkbox"></td>
@@ -265,7 +267,7 @@
            <tr>
                <td>4</td>
                <td><input id="net4Input" name="net4Input" type="text" maxlength="2" value="{{ch4['NET']}}" required></td>
-               <td><input id="station4Input" name="station4Input" type="text" maxlength="5"  value="{{ch4['STATION']}}" required></td>
+               <td><input id="station4Input" name="station4Input" type="text" maxlength="5" style="min-width:50px;" value="{{ch4['STATION']}}" required></td>
                <td><input id="loc4Input" name="loc4Input" type="text" size="2" maxlength="2" minlength="2" value="{{ch4['LOC']}}"></td>
                <td><input id="name4Input" name="name4Input" type="text" size="3" maxlength="3" minlength="3" value="{{ch4['NAME']}}" required></td>
                <td><input id="todisk4Input" name="todisk4Input" type="checkbox"></td>
@@ -275,7 +277,7 @@
            <tr>
                <td>5</td>
                <td><input id="net5Input" name="net5Input" type="text" maxlength="2" value="{{ch5['NET']}}" required></td>
-               <td><input id="station5Input" name="station5Input" type="text" maxlength="5" value="{{ch5['STATION']}}" required></td>
+               <td><input id="station5Input" name="station5Input" type="text" maxlength="5" style="min-width:50px;" value="{{ch5['STATION']}}" required></td>
                <td><input id="loc5Input" name="loc5Input" type="text" size="2" maxlength="2" minlength="2" value="{{ch5['LOC']}}"></td>
                <td><input id="name5Input" name="name5Input" type="text" size="3" maxlength="3" minlength="3" value="{{ch5['NAME']}}" required></td>
                <td><input id="todisk5Input" name="todisk5Input" type="checkbox"></td>
@@ -285,7 +287,7 @@
            <tr style="background-color: rgb(250, 128, 114);">
                <td>6</td>
                <td><input id="net6Input" name="net6Input" type="text" maxlength="2" value="{{ch6['NET']}}" style="background-color: silver;"></td>
-               <td><input id="station6Input" name="station6Input" type="text" maxlength="5"  value="{{ch6['STATION']}}" style="background-color: silver;"></td>
+               <td><input id="station6Input" name="station6Input" type="text" maxlength="5" style="min-width:50px;" value="{{ch6['STATION']}}" style="background-color: silver;"></td>
                <td><input id="loc6Input" name="loc6Input" type="text" size="2" maxlength="2" minlength="2" value="{{ch6['LOC']}}"></td>
                <td><input id="name6Input" name="name6Input" type="text" size="3" maxlength="3" minlength="3" value="{{ch6['NAME']}}" required></td>
                <td><input id="todisk6Input" name="todisk6Input" type="checkbox"></td>
@@ -422,22 +424,25 @@
         document.querySelector("#isRename").checked=true
         let regex = /^[^\s^\x00-\x1f\\?*:"";<>|\/.][^\x00-\x1f\\?*:"";<>|\/]*[^\s^\x00-\x1f\\?*:"";<>|\/.]+$/
         let newName=window.prompt("New Name:")
-        let stations=[]
-        let curSta=""
-        let navBar=document.querySelectorAll("#navBar li")
-        navBar.forEach((elem)=>{
-            curSta=elem.innerText.slice(0,-2)
-            stations.push(curSta)
-            //console.log(curSta)
-        })
-        if (!regex.test(newName)) {
-             window.alert("Incorrect name for the station")
-        } else if (stations.includes(newName)) {
-            window.alert("The entered name has already been used")
-        } else {
-            document.querySelector("#newNameSta").value=newName
-            $("#submit").click()
+        if (newName != null) {
+            let stations=[]
+            let curSta=""
+            let navBar=document.querySelectorAll("#navBar li")
+            navBar.forEach((elem)=>{
+                curSta=elem.innerText.slice(0,-2)
+                stations.push(curSta)
+                //console.log(curSta)
+            })
+            if (!regex.test(newName)) {
+                 window.alert("Incorrect name for the station")
+            } else if (stations.includes(newName)) {
+                window.alert("The entered name has already been used")
+            } else {
+                document.querySelector("#newNameSta").value=newName
+                $("#submit").click()
+            }
         }
+       
     }
 
     function IsSubmit() {
