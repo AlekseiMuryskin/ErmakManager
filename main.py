@@ -2,11 +2,22 @@ import os
 from flask import Flask, request, redirect
 from flask import render_template
 from configparser import ConfigParser
+import configparser
 import shutil
 import requests
-
+import tftpy
+from bs4 import BeautifulSoup
 
 app=Flask(__name__)
+
+def getYearFirmware(ip):
+    print(f"http://{ip}/status")
+    r = requests.get(f"http://{ip}/status", timeout=5)
+    soup = BeautifulSoup(r.text, "html.parser")
+    item = soup.find('td', text='Firmware').find_next_sibling("td")
+    item = int(str(item).split(" ")[1].split("-")[0])
+    return item
+
 
 def getStatusCode(dirlist):
     pth = "./ini/"
@@ -65,9 +76,11 @@ def newStation():
             newIP=request.form.get("newIP")
             try:
                 os.mkdir(pth + newName)
-                cmd = f"tftp.exe -i -v {newIP} get seisview_imp.ini"
-                os.system(cmd)
-                shutil.move("seisview_imp.ini",f"{pth+newName+'/seisview_imp.ini'}")
+                client = tftpy.TftpClient(newIP, 69)
+                client.download('seisview_imp.ini', f"{pth+newName+'/seisview_imp.ini'}", timeout=15)
+                #cmd = f"tftp.exe -i -v {newIP} get seisview_imp.ini"
+                #os.system(cmd)
+                #shutil.move("seisview_imp.ini",f"{pth+newName+'/seisview_imp.ini'}")
                 return redirect(f'/{newName}/last')
             except:
                 return "Sorry! The station is off-line."
@@ -561,6 +574,15 @@ def stationProp(station,version):
         ch5['TO_NET'] = int(bool(request.form.get("tonet5Input")))
         ch5['TO_DISP'] = int(bool(request.form.get("todisp5Input")))
 
+        ch6 = {}
+        ch6['NET'] = request.form.get("net6Input")
+        ch6['STATION'] = request.form.get("station6Input")
+        ch6['LOC'] = request.form.get("loc6Input")
+        ch6['NAME'] = request.form.get("name6Input")
+        ch6['TO_DISK'] = int(bool(request.form.get("todisk6Input")))
+        ch6['TO_NET'] = int(bool(request.form.get("tonet6Input")))
+        ch6['TO_DISP'] = int(bool(request.form.get("todisp6Input")))
+
         reboot['DAILY_REBOOT'] = int(bool(request.form.get("dailyrebootInput")))
         reboot['REBOOT_TIME'] = request.form.get("reboottimeInput")
 
@@ -574,6 +596,14 @@ def stationProp(station,version):
         new_inifile['CH3'] = ch3
         new_inifile['CH4'] = ch4
         new_inifile['CH5'] = ch5
+        try:
+            if (getYearFirmware(net['ETH_IP'])>2022):
+                print("It is new firmware")
+                new_inifile['CH6'] = ch6
+            else:
+                print("It is old firmware")
+        except:
+            return "Oops! Refresh and try again."
         new_inifile['TIME']=time
         new_inifile['NET']=net
         new_inifile['SOCKET0']=socket0
@@ -588,6 +618,8 @@ def stationProp(station,version):
             with open(pth + station + "/seisview_imp.ini", "w") as file_object:
                 new_inifile.write(file_object)
 
+            #client = tftpy.TftpClient(net['ETH_IP'], 69)
+            #client.upload('seisview_imp.ini', f"{pth + station + '/seisview_imp.ini'}", timeout=15)
             #cmd=f"tftp.exe -i -v {net['ETH_IP']} put {pth+station+'/seisview_imp.ini'}"
             #os.system(cmd)
 
@@ -613,9 +645,11 @@ def stationProp(station,version):
             with open(pth + station + "/seisview_imp_v" + str(ver) + ".ini", "w") as file_object:
                 new_inifile.write(file_object)
             try:
-                cmd = f"tftp.exe -i -v {net['ETH_IP']} get seisview_imp.ini"
-                os.system(cmd)
-                shutil.move("seisview_imp.ini",f"{pth + station + '/seisview_imp.ini'}")
+                client = tftpy.TftpClient(net['ETH_IP'], 69)
+                client.download('seisview_imp.ini', f"{pth + station + '/seisview_imp.ini'}", timeout=15)
+                #cmd = f"tftp.exe -i -v {net['ETH_IP']} get seisview_imp.ini"
+                #os.system(cmd)
+                #shutil.move("seisview_imp.ini",f"{pth + station + '/seisview_imp.ini'}")
                 #destination = pth + station + "/seisview_imp.ini"
                 #url = f"http://{net['ETH_IP']}/seisview_imp.ini"
                 #urllib.request.urlretrieve(url, destination)
