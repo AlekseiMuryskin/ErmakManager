@@ -5,119 +5,28 @@ from configparser import ConfigParser
 import configparser
 import shutil
 import requests
+import urllib
 import tftpy
 from bs4 import BeautifulSoup
 
 app=Flask(__name__)
 
-def getYearFirmware(ip):
-    print(f"http://{ip}/status")
-    r = requests.get(f"http://{ip}/status", timeout=5)
-    soup = BeautifulSoup(r.text, "html.parser")
-    item = soup.find('td', text='Firmware').find_next_sibling("td")
-    item = int(str(item).split(" ")[1].split("-")[0])
-    return item
 
-
-def getStatusCode(dirlist):
-    pth = "./ini/"
-    statusCodes={}
-    for sta in dirlist:
-        fname = pth + sta+ "/seisview_imp.ini"
-        config = ConfigParser()
-        config.read(fname)
-        #statusCodes[sta]=f"http://{config.get('NET', 'ETH_IP')}/status"
-        try:
-            r=requests.get(f"http://{config.get('NET', 'ETH_IP')}/status", timeout=0.1).status_code == 200
-        except:
-            r=False
-        if r:
-            statusCodes[sta] = "green"
-        else:
-            statusCodes[sta] = "green"
-    return statusCodes
-
-@app.route('/')
-def index():
-    pth="./ini/"
-    dirlist=os.listdir(pth)
-    statusCodes=getStatusCode(dirlist)
-    stat={}
-    net = {}
-    time = {}
-    socket0 = {}
-    socket1 = {}
-    socket2 = {}
-    socket3 = {}
-    ch0 = {}
-    ch1 = {}
-    ch2 = {}
-    ch3 = {}
-    ch4 = {}
-    ch5 = {}
-    ch6 = {}
-    reboot={}
-    chooseSta = ""
-    chooseVersion = ""
-    flist={}
-    return render_template('index.html',  station=dirlist, chooseSta=chooseSta,chooseVersion=chooseVersion, stat=stat, net=net, time=time,
-                           soc0=socket0, soc1=socket1, soc2=socket2, soc3=socket3, reboot=reboot, hasSta=False,
-                           ch0=ch0, ch1=ch1, ch2=ch2, ch3=ch3, ch4=ch4, ch5=ch5,ch6=ch6, version_list=flist, statusCodes=statusCodes)
-
-@app.route('/newsta', methods=["GET","POST"])
-def newStation():
-    pth="./ini/"
-    dirlist=os.listdir(pth)
-    statusCodes=getStatusCode(dirlist)
-    chooseSta = ""
-    if request.method == "POST":
-        if int(bool(request.form.get("isErmak")))==1:
-            newName=request.form.get("newName")
-            newIP=request.form.get("newIP")
-            try:
-                os.mkdir(pth + newName)
-                client = tftpy.TftpClient(newIP, 69)
-                client.download('seisview_imp.ini', f"{pth+newName+'/seisview_imp.ini'}", timeout=15)
-                #cmd = f"tftp.exe -i -v {newIP} get seisview_imp.ini"
-                #os.system(cmd)
-                #shutil.move("seisview_imp.ini",f"{pth+newName+'/seisview_imp.ini'}")
-                return redirect(f'/{newName}/last')
-            except:
-                return "Sorry! The station is off-line."
-        else:
-            newName = request.form.get("newName")
-            fileINI = request.files.get('file', None)
-            os.mkdir(pth + newName)
-            fileINI.save(f"{pth + newName}/seisview_imp.ini")
-            return redirect(f"/{newName}/last")
-
-    return render_template('newsta.html',  station=dirlist, statusCodes=statusCodes, chooseSta=chooseSta, hasSta=False)
-
-
-
-@app.route('/<station>/<version>', methods=["GET","POST"])
-def stationProp(station,version):
-
-    pth = "./ini/"
-    dirlist = os.listdir(pth)
+def readini(fname):
     config = ConfigParser()
-    if version!="last":
-        fname=pth+station+"/seisview_imp_"+version+".ini"
-    else:
-        fname=pth+station+"/seisview_imp.ini"
-
-    config.read(fname)
-    flist=os.listdir(pth+station+"/")
-
-    flist=sorted([x.replace("seisview_imp","last").replace(".ini","").replace("last_","") for x in flist], key=len)
-    flist=flist[::-1]
-    stat= {}
+    readErr=0
     try:
-        stat['device_name']=config.get('SYSTEM','DEVICE_NAME')
+        config.read(fname)
+    except:
+        readErr=1
+
+    stat = {}
+    try:
+        stat['device_name'] = config.get('SYSTEM', 'DEVICE_NAME')
     except:
         stat['device_name'] = "LAB PTS"
     try:
-        stat['samprate']=config.get('SYSTEM','SAMPRATE')
+        stat['samprate'] = config.get('SYSTEM', 'SAMPRATE')
     except:
         stat['samprate'] = "500"
     try:
@@ -149,9 +58,9 @@ def stationProp(station,version):
     except:
         stat['LEN'] = "3600"
 
-    net={}
+    net = {}
     try:
-        net['ETH_POW']=int(config.get('NET','ETH_POW'))
+        net['ETH_POW'] = int(config.get('NET', 'ETH_POW'))
     except:
         net['ETH_POW'] = 0
     try:
@@ -159,7 +68,7 @@ def stationProp(station,version):
     except:
         net['DSL_POW'] = 1
     try:
-        net['ETH_IP']=config.get('NET','ETH_IP')
+        net['ETH_IP'] = config.get('NET', 'ETH_IP')
     except:
         net['ETH_IP'] = "192.168.192.168"
     try:
@@ -171,9 +80,9 @@ def stationProp(station,version):
     except:
         net['ETH_GW'] = "192.168.192.1"
 
-    time={}
+    time = {}
     try:
-        time['SOURCE']=config.get('TIME','SOURCE')
+        time['SOURCE'] = config.get('TIME', 'SOURCE')
     except:
         time['SOURCE'] = "3"
     try:
@@ -189,13 +98,13 @@ def stationProp(station,version):
     except:
         time['GPS_SLEEP_TIME'] = "0"
 
-    socket0={}
+    socket0 = {}
     try:
-        socket0['SERVICE']=config.get('SOCKET0','SERVICE')
+        socket0['SERVICE'] = config.get('SOCKET0', 'SERVICE')
     except:
         socket0['SERVICE'] = "1"
-    if int(socket0['SERVICE'])==7:
-        socket0['SERVICE']=5
+    if int(socket0['SERVICE']) == 7:
+        socket0['SERVICE'] = 5
     try:
         socket0['PORT'] = config.get('SOCKET0', 'PORT')
     except:
@@ -206,8 +115,8 @@ def stationProp(station,version):
         socket1['SERVICE'] = config.get('SOCKET1', 'SERVICE')
     except:
         socket1['SERVICE'] = "1"
-    if int(socket1['SERVICE'])==7:
-        socket1['SERVICE']=5
+    if int(socket1['SERVICE']) == 7:
+        socket1['SERVICE'] = 5
     try:
         socket1['PORT'] = config.get('SOCKET1', 'PORT')
     except:
@@ -218,8 +127,8 @@ def stationProp(station,version):
         socket2['SERVICE'] = config.get('SOCKET2', 'SERVICE')
     except:
         socket2['SERVICE'] = "1"
-    if int(socket2['SERVICE'])==7:
-        socket2['SERVICE']=5
+    if int(socket2['SERVICE']) == 7:
+        socket2['SERVICE'] = 5
     try:
         socket2['PORT'] = config.get('SOCKET2', 'PORT')
     except:
@@ -230,16 +139,16 @@ def stationProp(station,version):
         socket3['SERVICE'] = config.get('SOCKET3', 'SERVICE')
     except:
         socket3['SERVICE'] = "1"
-    if int(socket3['SERVICE'])==7:
-        socket3['SERVICE']=5
+    if int(socket3['SERVICE']) == 7:
+        socket3['SERVICE'] = 5
     try:
         socket3['PORT'] = config.get('SOCKET3', 'PORT')
     except:
         socket3['PORT'] = "80"
 
-    ch0={}
+    ch0 = {}
     try:
-        ch0['NET']=config.get('CH0','NET')
+        ch0['NET'] = config.get('CH0', 'NET')
     except:
         ch0['NET'] = "PR"
     try:
@@ -447,9 +356,9 @@ def stationProp(station,version):
     except:
         ch6['TO_DISP'] = 1
 
-    reboot={}
+    reboot = {}
     try:
-        reboot['DAILY_REBOOT']=int(config.get('REBOOT', 'DAILY_REBOOT'))
+        reboot['DAILY_REBOOT'] = int(config.get('REBOOT', 'DAILY_REBOOT'))
     except:
         reboot['DAILY_REBOOT'] = 0
     try:
@@ -457,6 +366,115 @@ def stationProp(station,version):
     except:
         reboot['REBOOT_TIME'] = "00:00"
 
+    return stat, time, net, socket0, socket1, socket2, socket3,ch0,ch1,ch2,ch3,ch4,ch5,ch6,reboot, readErr
+
+
+def getYearFirmware(ip):
+    #print(f"http://{ip}/status")
+    r = requests.get(f"http://{ip}/status", timeout=15)
+    soup = BeautifulSoup(r.text, "html.parser")
+    item = soup.find('td', text='Firmware').find_next_sibling("td")
+    item = int(str(item).split(" ")[1].split("-")[0])
+    return item
+
+
+def getStatusCode(dirlist):
+    pth = "./ini/"
+    statusCodes={}
+    for sta in dirlist:
+        fname = pth + sta+ "/seisview_imp.ini"
+        config = ConfigParser()
+        readErr= False
+        try:
+            config.read(fname)
+        except:
+            readErr=True
+        try:
+            r=requests.get(f"http://{config.get('NET', 'ETH_IP')}/status", timeout=0.1).status_code == 200
+        except:
+            r=False
+        if not readErr:
+            statusCodes[sta] = "green"
+        else:
+            statusCodes[sta] = "red"
+    return statusCodes
+
+@app.route('/')
+def index():
+    pth="./ini/"
+    dirlist=os.listdir(pth)
+    statusCodes=getStatusCode(dirlist)
+    stat={}
+    net = {}
+    time = {}
+    socket0 = {}
+    socket1 = {}
+    socket2 = {}
+    socket3 = {}
+    ch0 = {}
+    ch1 = {}
+    ch2 = {}
+    ch3 = {}
+    ch4 = {}
+    ch5 = {}
+    ch6 = {}
+    reboot={}
+    chooseSta = ""
+    chooseVersion = ""
+    flist={}
+    return render_template('index.html',  station=dirlist, chooseSta=chooseSta,chooseVersion=chooseVersion, stat=stat, net=net, time=time,
+                           soc0=socket0, soc1=socket1, soc2=socket2, soc3=socket3, reboot=reboot, hasSta=False,
+                           ch0=ch0, ch1=ch1, ch2=ch2, ch3=ch3, ch4=ch4, ch5=ch5,ch6=ch6, version_list=flist, statusCodes=statusCodes)
+
+@app.route('/newsta', methods=["GET","POST"])
+def newStation():
+    pth="./ini/"
+    dirlist=os.listdir(pth)
+    statusCodes=getStatusCode(dirlist)
+    chooseSta = ""
+    if request.method == "POST":
+        if int(bool(request.form.get("isErmak")))==1:
+            newName=request.form.get("newName")
+            newIP=request.form.get("newIP")
+            try:
+                os.mkdir(pth + newName)
+                #client = tftpy.TftpClient(newIP, 69)
+                #client.download('seisview_imp.ini', f"{pth+newName+'/seisview_imp.ini'}", timeout=60)
+                destination = pth + newName + "/seisview_imp.ini"
+                url = f"http://{newIP}/seisview_imp.ini"
+                urllib.request.urlretrieve(url, destination)
+                #cmd = f"tftp.exe -i -v {newIP} get seisview_imp.ini"
+                #os.system(cmd)
+                #shutil.move("seisview_imp.ini",f"{pth+newName+'/seisview_imp.ini'}")
+                return redirect(f'/{newName}/last')
+            except:
+                return "Sorry! The station is off-line."
+        else:
+            newName = request.form.get("newName")
+            fileINI = request.files.get('file', None)
+            os.mkdir(pth + newName)
+            fileINI.save(f"{pth + newName}/seisview_imp.ini")
+            return redirect(f"/{newName}/last")
+
+    return render_template('newsta.html',  station=dirlist, statusCodes=statusCodes, chooseSta=chooseSta, hasSta=False)
+
+
+
+@app.route('/<station>/<version>', methods=["GET","POST"])
+def stationProp(station,version):
+
+    pth = "./ini/"
+    dirlist = os.listdir(pth)
+
+    if version!="last":
+        fname=pth+station+"/seisview_imp_"+version+".ini"
+    else:
+        fname=pth+station+"/seisview_imp.ini"
+
+    flist = os.listdir(pth + station + "/")
+    flist = sorted([x.replace("seisview_imp", "last").replace(".ini", "").replace("last_", "") for x in flist], key=len)
+    flist = flist[::-1]
+    stat, time, net, socket0, socket1, socket2, socket3, ch0, ch1, ch2, ch3, ch4, ch5, ch6, reboot, readErr = readini(fname)
     chooseSta=station
     chooseVersion = version
     statusCodes = getStatusCode(dirlist)
@@ -598,10 +616,8 @@ def stationProp(station,version):
         new_inifile['CH5'] = ch5
         try:
             if (getYearFirmware(net['ETH_IP'])>2022):
-                print("It is new firmware")
+                #print("It is new firmware")
                 new_inifile['CH6'] = ch6
-            else:
-                print("It is old firmware")
         except:
             return "Oops! Refresh and try again."
         new_inifile['TIME']=time
@@ -610,16 +626,19 @@ def stationProp(station,version):
         new_inifile['SOCKET1'] = socket1
         new_inifile['SOCKET2'] = socket2
         new_inifile['SOCKET3'] = socket3
-        new_inifile['REBOOT'] = socket3
+        new_inifile['REBOOT'] = reboot
         ver=len(flist)
 
         if int(bool(request.form.get("isSend")))==1:
             shutil.copy2(pth+station+"/seisview_imp.ini", pth+station+"/seisview_imp_v"+str(ver)+".ini")
             with open(pth + station + "/seisview_imp.ini", "w") as file_object:
                 new_inifile.write(file_object)
+            try:
+                client = tftpy.TftpClient(net['ETH_IP'], 69)
+                client.upload('seisview_imp.ini', f"{pth + station + '/seisview_imp.ini'}", timeout=30)
+            except:
+                pass
 
-            #client = tftpy.TftpClient(net['ETH_IP'], 69)
-            #client.upload('seisview_imp.ini', f"{pth + station + '/seisview_imp.ini'}", timeout=15)
             #cmd=f"tftp.exe -i -v {net['ETH_IP']} put {pth+station+'/seisview_imp.ini'}"
             #os.system(cmd)
 
@@ -645,14 +664,14 @@ def stationProp(station,version):
             with open(pth + station + "/seisview_imp_v" + str(ver) + ".ini", "w") as file_object:
                 new_inifile.write(file_object)
             try:
-                client = tftpy.TftpClient(net['ETH_IP'], 69)
-                client.download('seisview_imp.ini', f"{pth + station + '/seisview_imp.ini'}", timeout=15)
+                #client = tftpy.TftpClient(net['ETH_IP'], 69)
+                #client.download('seisview_imp.ini', f"{pth + station + '/seisview_imp.ini'}", timeout=30)
                 #cmd = f"tftp.exe -i -v {net['ETH_IP']} get seisview_imp.ini"
                 #os.system(cmd)
                 #shutil.move("seisview_imp.ini",f"{pth + station + '/seisview_imp.ini'}")
-                #destination = pth + station + "/seisview_imp.ini"
-                #url = f"http://{net['ETH_IP']}/seisview_imp.ini"
-                #urllib.request.urlretrieve(url, destination)
+                destination = pth + station + "/seisview_imp.ini"
+                url = f"http://{net['ETH_IP']}/seisview_imp.ini"
+                urllib.request.urlretrieve(url, destination)
 
                 return redirect(f"/{chooseSta}/last")
             except:
