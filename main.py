@@ -694,7 +694,7 @@ for f in tmpl:
         filedata = file.read()
 
     # Replace the target string
-    filedata = filedata.replace('192.168.35.94:81', config_addr)
+    filedata = filedata.replace('192.168.35.94:5081', config_addr)
 
     # Write the file out again
     with open("templates/"+f, 'w') as file:
