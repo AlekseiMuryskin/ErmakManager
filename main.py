@@ -683,4 +683,22 @@ def stationProp(station,version):
 
 
 
+tmpl=os.listdir("templates")
+with open("config.txt","r") as file:
+    data = file.readlines()
+    config_addr = data[0].strip()
+
+for f in tmpl:
+    # Read in the file
+    with open("templates/"+f, 'r') as file:
+        filedata = file.read()
+
+    # Replace the target string
+    filedata = filedata.replace('192.168.35.94:81', config_addr)
+
+    # Write the file out again
+    with open("templates/"+f, 'w') as file:
+        file.write(filedata)
+
+
 app.run(host='0.0.0.0', port=5081)

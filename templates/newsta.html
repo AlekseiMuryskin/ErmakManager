@@ -9,9 +9,9 @@
 </style>
  {% for sta in station %}
     {% if sta == chooseSta %}
-        <li><a id="{{sta}}" class="curSta" title="{{statusCodes[sta]}}" href="http://192.168.35.94:81/{{sta}}/last">{{sta}} <div style="display:inline-block;font-size:140%;color:{{statusCodes[sta]}}"> ●</div></a> </li>
+        <li><a id="{{sta}}" class="curSta" title="{{statusCodes[sta]}}" href="http://192.168.35.94:5081/{{sta}}/last">{{sta}} <div style="display:inline-block;font-size:140%;color:{{statusCodes[sta]}}"> ●</div></a> </li>
     {% else %}
-       <li><a id="{{sta}}" title="{{statusCodes[sta]}}" href="http://192.168.35.94:81/{{sta}}/last">{{sta}} <div style="display:inline-block;font-size:140%;color:{{statusCodes[sta]}}"> ●</div></a> </li>
+       <li><a id="{{sta}}" title="{{statusCodes[sta]}}" href="http://192.168.35.94:5081/{{sta}}/last">{{sta}} <div style="display:inline-block;font-size:140%;color:{{statusCodes[sta]}}"> ●</div></a> </li>
     {% endif %}
  
  {% endfor %}
@@ -188,7 +188,7 @@
         if (window.confirm("Do you want delete current station?")) {
             console.log("yes")
             $("#delete").click()
-            //window.location.href = 'http://192.168.35.94:81/';
+            //window.location.href = 'http://192.168.35.94:5081/';
         } else {
             console.log("No")
         }
