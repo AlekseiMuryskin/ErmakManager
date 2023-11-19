@@ -113,22 +113,30 @@ def readini(fname):
     socket1 = {}
     try:
         socket1['SERVICE'] = config.get('SOCKET1', 'SERVICE')
+        if (socket1['SERVICE'] == ""):
+            socket1['SERVICE'] = "1"
     except:
         socket1['SERVICE'] = "1"
+
     if int(socket1['SERVICE']) == 7:
         socket1['SERVICE'] = 5
     try:
         socket1['PORT'] = config.get('SOCKET1', 'PORT')
+
     except:
         socket1['PORT'] = "80"
 
     socket2 = {}
     try:
         socket2['SERVICE'] = config.get('SOCKET2', 'SERVICE')
+        if (socket2['SERVICE'] == ""):
+            socket2['SERVICE'] = "1"
     except:
         socket2['SERVICE'] = "1"
+
     if int(socket2['SERVICE']) == 7:
         socket2['SERVICE'] = 5
+
     try:
         socket2['PORT'] = config.get('SOCKET2', 'PORT')
     except:
@@ -137,10 +145,14 @@ def readini(fname):
     socket3 = {}
     try:
         socket3['SERVICE'] = config.get('SOCKET3', 'SERVICE')
+        if (socket3['SERVICE'] == ""):
+            socket3['SERVICE'] = "1"
     except:
         socket3['SERVICE'] = "1"
+
     if int(socket3['SERVICE']) == 7:
         socket3['SERVICE'] = 5
+
     try:
         socket3['PORT'] = config.get('SOCKET3', 'PORT')
     except:
