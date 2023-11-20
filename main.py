@@ -444,6 +444,7 @@ def index():
 def newStation():
     pth="./ini/"
     dirlist=os.listdir(pth)
+    dirlist.sort()
     statusCodes=getStatusCode(dirlist)
     chooseSta = ""
     if request.method == "POST":
