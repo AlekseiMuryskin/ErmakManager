@@ -417,6 +417,7 @@ def getStatusCode(dirlist):
 def index():
     pth="./ini/"
     dirlist=os.listdir(pth)
+    dirlist.sort()
     statusCodes=getStatusCode(dirlist)
     stat={}
     net = {}
@@ -444,7 +445,7 @@ def index():
 def newStation():
     pth="./ini/"
     dirlist=os.listdir(pth)
-    dirlist=sorted(dirlist)
+    dirlist.sort()
     statusCodes=getStatusCode(dirlist)
     chooseSta = ""
     if request.method == "POST":
@@ -480,7 +481,7 @@ def stationProp(station,version):
 
     pth = "./ini/"
     dirlist = os.listdir(pth)
-
+    dirlist.sort()
     if version!="last":
         fname=pth+station+"/seisview_imp_"+version+".ini"
     else:
@@ -498,6 +499,7 @@ def stationProp(station,version):
             pth = "./ini/"
             shutil.rmtree(pth + station)
             dirlist = os.listdir(pth)
+            dirlist.sort()
             return redirect("/")
 
         elif int(bool(request.form.get("isRename")))==1:
@@ -528,6 +530,7 @@ def stationProp(station,version):
 
         pth = "./ini/"
         dirlist = os.listdir(pth)
+        dirlist.sort()
         config = ConfigParser()
         fname = pth + station + "/seisview_imp.ini"
         config.read(fname)
