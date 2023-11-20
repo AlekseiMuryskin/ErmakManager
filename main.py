@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, redirect
+from flask import Flask, request, redirect, send_file
 from flask import render_template
 from configparser import ConfigParser
 import configparser
@@ -102,7 +102,7 @@ def readini(fname):
     try:
         socket0['SERVICE'] = config.get('SOCKET0', 'SERVICE')
     except:
-        socket0['SERVICE'] = "1"
+        socket0['SERVICE'] = "0"
     if int(socket0['SERVICE']) == 7:
         socket0['SERVICE'] = 5
     try:
@@ -114,25 +114,25 @@ def readini(fname):
     try:
         socket1['SERVICE'] = config.get('SOCKET1', 'SERVICE')
         if (socket1['SERVICE'] == ""):
-            socket1['SERVICE'] = "1"
+            socket1['SERVICE'] = "0"
     except:
-        socket1['SERVICE'] = "1"
+        socket1['SERVICE'] = "0"
 
     if int(socket1['SERVICE']) == 7:
         socket1['SERVICE'] = 5
+
     try:
         socket1['PORT'] = config.get('SOCKET1', 'PORT')
-
     except:
-        socket1['PORT'] = "80"
+        socket1['PORT'] = "18000"
 
     socket2 = {}
     try:
         socket2['SERVICE'] = config.get('SOCKET2', 'SERVICE')
         if (socket2['SERVICE'] == ""):
-            socket2['SERVICE'] = "1"
+            socket2['SERVICE'] = "0"
     except:
-        socket2['SERVICE'] = "1"
+        socket2['SERVICE'] = "0"
 
     if int(socket2['SERVICE']) == 7:
         socket2['SERVICE'] = 5
@@ -140,15 +140,15 @@ def readini(fname):
     try:
         socket2['PORT'] = config.get('SOCKET2', 'PORT')
     except:
-        socket2['PORT'] = "80"
+        socket2['PORT'] = "123"
 
     socket3 = {}
     try:
         socket3['SERVICE'] = config.get('SOCKET3', 'SERVICE')
         if (socket3['SERVICE'] == ""):
-            socket3['SERVICE'] = "1"
+            socket3['SERVICE'] = "0"
     except:
-        socket3['SERVICE'] = "1"
+        socket3['SERVICE'] = "0"
 
     if int(socket3['SERVICE']) == 7:
         socket3['SERVICE'] = 5
@@ -156,7 +156,7 @@ def readini(fname):
     try:
         socket3['PORT'] = config.get('SOCKET3', 'PORT')
     except:
-        socket3['PORT'] = "80"
+        socket3['PORT'] = "69"
 
     ch0 = {}
     try:
@@ -339,6 +339,8 @@ def readini(fname):
         ch5['TO_DISP'] = 1
 
     ch6 = {}
+    ch6['HAS_SECTION']=config.has_section('CH6')
+
     try:
         ch6['NET'] = config.get('CH6', 'NET')
     except:
@@ -491,6 +493,38 @@ def stationProp(station,version):
     chooseVersion = version
     statusCodes = getStatusCode(dirlist)
     if request.method=="POST":
+        if int(bool(request.form.get("isDelete")))==1:
+            pth = "./ini/"
+            shutil.rmtree(pth + station)
+            dirlist = os.listdir(pth)
+            return redirect("/")
+
+        elif int(bool(request.form.get("isRename")))==1:
+            newName=request.form.get("newNameSta")
+            pth = "./ini/"
+            try:
+                shutil.move(f"{pth}/{chooseSta}",f"{pth}/{newName}")
+                return redirect(f"/{newName}/last")
+            except:
+                return "Sorry! New name station is incorrect."
+
+        elif int(bool(request.form.get("isExport")))==1:
+
+            pth = "./ini/"
+            fname=""
+            if chooseVersion == 'last':
+                fname="seisview_imp.ini"
+            else:
+                fname="seisview_imp_" + chooseVersion + ".ini"
+
+            try:
+                #return f"{pth}/{chooseSta}/{fname}"
+                return send_file(f"{pth}/{chooseSta}/{fname}", as_attachment=True,  attachment_filename="seisview_imp.ini", mimetype='text/csv')
+            except:
+                return "Sorry! Refresh page and try again."
+
+
+
         pth = "./ini/"
         dirlist = os.listdir(pth)
         config = ConfigParser()
@@ -605,13 +639,16 @@ def stationProp(station,version):
         ch5['TO_DISP'] = int(bool(request.form.get("todisp5Input")))
 
         ch6 = {}
-        ch6['NET'] = request.form.get("net6Input")
-        ch6['STATION'] = request.form.get("station6Input")
-        ch6['LOC'] = request.form.get("loc6Input")
-        ch6['NAME'] = request.form.get("name6Input")
-        ch6['TO_DISK'] = int(bool(request.form.get("todisk6Input")))
-        ch6['TO_NET'] = int(bool(request.form.get("tonet6Input")))
-        ch6['TO_DISP'] = int(bool(request.form.get("todisp6Input")))
+        try:
+            ch6['NET'] = request.form.get("net6Input")
+            ch6['STATION'] = request.form.get("station6Input")
+            ch6['LOC'] = request.form.get("loc6Input")
+            ch6['NAME'] = request.form.get("name6Input")
+            ch6['TO_DISK'] = int(bool(request.form.get("todisk6Input")))
+            ch6['TO_NET'] = int(bool(request.form.get("tonet6Input")))
+            ch6['TO_DISP'] = int(bool(request.form.get("todisp6Input")))
+        except:
+            pass
 
         reboot['DAILY_REBOOT'] = int(bool(request.form.get("dailyrebootInput")))
         reboot['REBOOT_TIME'] = request.form.get("reboottimeInput")
@@ -656,20 +693,6 @@ def stationProp(station,version):
 
             return redirect(f"/{chooseSta}/last")
 
-        elif int(bool(request.form.get("isDelete")))==1:
-            pth = "./ini/"
-            shutil.rmtree(pth + station)
-            dirlist = os.listdir(pth)
-            return redirect("/")
-
-        elif int(bool(request.form.get("isRename")))==1:
-            newName=request.form.get("newNameSta")
-            pth = "./ini/"
-            try:
-                shutil.move(f"{pth}/{chooseSta}",f"{pth}/{newName}")
-                return redirect(f"/{newName}/last")
-            except:
-                return "Sorry! New name station is incorrect."
 
         else:
             #shutil.copy2(pth + station + "/seisview_imp.ini", pth + station + "/seisview_imp_v" + str(ver) + ".ini")
