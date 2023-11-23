@@ -14,101 +14,137 @@ app=Flask(__name__)
 
 def readini(fname):
     config = ConfigParser()
-    readErr=0
+    readErr=False
     try:
         config.read(fname)
     except:
-        readErr=1
+        readErr=True
 
     stat = {}
     try:
         stat['device_name'] = config.get('SYSTEM', 'DEVICE_NAME')
     except:
         stat['device_name'] = "LAB PTS"
+        readErr = True
+
     try:
         stat['samprate'] = config.get('SYSTEM', 'SAMPRATE')
     except:
         stat['samprate'] = "500"
+        readErr = True
+
     try:
         stat['LCD_ON_TIME'] = config.get('SYSTEM', 'LCD_ON_TIME')
     except:
         stat['LCD_ON_TIME'] = "255"
+        readErr = True
+
     try:
         stat['TEMP_MES_INT'] = config.get('SYSTEM', 'TEMP_MES_INT')
     except:
         stat['TEMP_MES_INT'] = "3600"
+        readErr = True
+
     try:
         stat['SENS_POW'] = int(config.get('SYSTEM', 'SENS_POW'))
     except:
         stat['SENS_POW'] = 0
+        readErr = True
     try:
         stat['SLOW_REC_INTERVAL'] = config.get('SYSTEM', 'SLOW_REC_INTERVAL')
     except:
         stat['SLOW_REC_INTERVAL'] = 0
+        readErr = True
+
     try:
         stat['GAIN'] = int(config.get('SYSTEM', 'GAIN'))
     except:
         stat['GAIN'] = 1
+        readErr = True
+
     try:
         stat['AUTO'] = int(config.get('SYSTEM', 'AUTO'))
     except:
         stat['AUTO'] = 1
+        readErr = True
+
     try:
         stat['LEN'] = config.get('SYSTEM', 'LEN')
     except:
         stat['LEN'] = "3600"
+        readErr = True
 
     net = {}
     try:
         net['ETH_POW'] = int(config.get('NET', 'ETH_POW'))
     except:
         net['ETH_POW'] = 0
+        readErr = True
+
     try:
         net['DSL_POW'] = int(config.get('NET', 'DSL_POW'))
     except:
         net['DSL_POW'] = 1
+        readErr = True
+
     try:
         net['ETH_IP'] = config.get('NET', 'ETH_IP')
     except:
         net['ETH_IP'] = "192.168.192.168"
+        readErr = True
+
     try:
         net['ETH_MASK'] = config.get('NET', 'ETH_MASK')
     except:
         net['ETH_MASK'] = "255.255.255.0"
+        readErr = True
+
     try:
         net['ETH_GW'] = config.get('NET', 'ETH_GW')
     except:
         net['ETH_GW'] = "192.168.192.1"
+        readErr = True
 
     time = {}
     try:
         time['SOURCE'] = config.get('TIME', 'SOURCE')
     except:
         time['SOURCE'] = "3"
+        readErr = True
+
     try:
         time['NTP_IP'] = config.get('TIME', 'NTP_IP')
     except:
         time['NTP_IP'] = "192.168.192.1"
+        readErr = True
+
     try:
         time['NTP_PORT'] = config.get('TIME', 'NTP_PORT')
     except:
         time['NTP_PORT'] = "123"
+        readErr = True
+
     try:
         time['GPS_SLEEP_TIME'] = config.get('TIME', 'GPS_SLEEP_TIME')
     except:
         time['GPS_SLEEP_TIME'] = "0"
+        readErr = True
 
     socket0 = {}
     try:
         socket0['SERVICE'] = config.get('SOCKET0', 'SERVICE')
     except:
         socket0['SERVICE'] = "0"
+        readErr = True
+
     if int(socket0['SERVICE']) == 7:
         socket0['SERVICE'] = 5
+
     try:
         socket0['PORT'] = config.get('SOCKET0', 'PORT')
     except:
         socket0['PORT'] = "80"
+        readErr = True
 
     socket1 = {}
     try:
@@ -117,6 +153,7 @@ def readini(fname):
             socket1['SERVICE'] = "0"
     except:
         socket1['SERVICE'] = "0"
+        readErr = True
 
     if int(socket1['SERVICE']) == 7:
         socket1['SERVICE'] = 5
@@ -125,6 +162,7 @@ def readini(fname):
         socket1['PORT'] = config.get('SOCKET1', 'PORT')
     except:
         socket1['PORT'] = "18000"
+        readErr = True
 
     socket2 = {}
     try:
@@ -133,6 +171,7 @@ def readini(fname):
             socket2['SERVICE'] = "0"
     except:
         socket2['SERVICE'] = "0"
+        readErr = True
 
     if int(socket2['SERVICE']) == 7:
         socket2['SERVICE'] = 5
@@ -141,6 +180,7 @@ def readini(fname):
         socket2['PORT'] = config.get('SOCKET2', 'PORT')
     except:
         socket2['PORT'] = "123"
+        readErr = True
 
     socket3 = {}
     try:
@@ -149,6 +189,7 @@ def readini(fname):
             socket3['SERVICE'] = "0"
     except:
         socket3['SERVICE'] = "0"
+        readErr = True
 
     if int(socket3['SERVICE']) == 7:
         socket3['SERVICE'] = 5
@@ -157,16 +198,21 @@ def readini(fname):
         socket3['PORT'] = config.get('SOCKET3', 'PORT')
     except:
         socket3['PORT'] = "69"
+        readErr = True
 
     ch0 = {}
     try:
         ch0['NET'] = config.get('CH0', 'NET')
     except:
         ch0['NET'] = "PR"
+        readErr = True
+
     try:
         ch0['STATION'] = config.get('CH0', 'STATION')
     except:
         ch0['STATION'] = "PTSLB"
+        readErr = True
+
     try:
         ch0['LOC'] = config.get('CH0', 'LOC')
     except:
@@ -175,210 +221,298 @@ def readini(fname):
         ch0['NAME'] = config.get('CH0', 'NAME')
     except:
         ch0['NAME'] = "CH0"
+        readErr = True
+
     try:
         ch0['TO_DISK'] = int(config.get('CH0', 'TO_DISK'))
     except:
         ch0['TO_DISK'] = 1
+        readErr = True
+
     try:
         ch0['TO_NET'] = int(config.get('CH0', 'TO_NET'))
     except:
         ch0['TO_NET'] = 1
+        readErr = True
+
     try:
         ch0['TO_DISP'] = int(config.get('CH0', 'TO_DISP'))
     except:
         ch0['TO_DISP'] = 1
+        readErr = True
 
     ch1 = {}
     try:
         ch1['NET'] = config.get('CH1', 'NET')
     except:
         ch1['NET'] = "PR"
+        readErr = True
+
     try:
         ch1['STATION'] = config.get('CH1', 'STATION')
     except:
         ch1['STATION'] = "PTSLB"
+        readErr = True
+
     try:
         ch1['LOC'] = config.get('CH1', 'LOC')
     except:
         ch1['LOC'] = "00"
+        readErr = True
+
     try:
         ch1['NAME'] = config.get('CH1', 'NAME')
     except:
         ch1['NAME'] = "CH1"
+        readErr = True
+
     try:
         ch1['TO_DISK'] = int(config.get('CH1', 'TO_DISK'))
     except:
         ch1['TO_DISK'] = 1
+        readErr = True
+
     try:
         ch1['TO_NET'] = int(config.get('CH1', 'TO_NET'))
     except:
         ch1['TO_NET'] = 1
+        readErr = True
+
     try:
         ch1['TO_DISP'] = int(config.get('CH1', 'TO_DISP'))
     except:
         ch1['TO_DISP'] = 1
+        readErr = True
 
     ch2 = {}
     try:
         ch2['NET'] = config.get('CH2', 'NET')
     except:
         ch2['NET'] = "PR"
+        readErr = True
+
     try:
         ch2['STATION'] = config.get('CH2', 'STATION')
     except:
         ch2['STATION'] = "PTSLB"
+        readErr = True
+
     try:
         ch2['LOC'] = config.get('CH2', 'LOC')
     except:
         ch2['LOC'] = "00"
+        readErr = True
+
     try:
         ch2['NAME'] = config.get('CH2', 'NAME')
     except:
         ch2['NAME'] = "CH2"
+        readErr = True
+
     try:
         ch2['TO_DISK'] = int(config.get('CH2', 'TO_DISK'))
     except:
         ch2['TO_DISK'] = 1
+        readErr = True
+
     try:
         ch2['TO_NET'] = int(config.get('CH2', 'TO_NET'))
     except:
         ch2['TO_NET'] = 1
+        readErr = True
+
     try:
         ch2['TO_DISP'] = int(config.get('CH2', 'TO_DISP'))
     except:
         ch2['TO_DISP'] = 1
+        readErr = True
 
     ch3 = {}
     try:
         ch3['NET'] = config.get('CH3', 'NET')
     except:
         ch3['NET'] = "PR"
+        readErr = True
+
     try:
         ch3['STATION'] = config.get('CH3', 'STATION')
     except:
         ch3['STATION'] = "PTSLB"
+        readErr = True
+
     try:
         ch3['LOC'] = config.get('CH3', 'LOC')
     except:
         ch3['LOC'] = "00"
+        readErr = True
+
     try:
         ch3['NAME'] = config.get('CH3', 'NAME')
     except:
         ch3['NAME'] = "CH3"
+        readErr = True
+
     try:
         ch3['TO_DISK'] = int(config.get('CH3', 'TO_DISK'))
     except:
         ch3['TO_DISK'] = 1
+        readErr = True
+
     try:
         ch3['TO_NET'] = int(config.get('CH3', 'TO_NET'))
     except:
         ch3['TO_NET'] = 1
+        readErr = True
+
     try:
         ch3['TO_DISP'] = int(config.get('CH3', 'TO_DISP'))
     except:
         ch3['TO_DISP'] = 1
+        readErr = True
 
     ch4 = {}
     try:
         ch4['NET'] = config.get('CH4', 'NET')
     except:
         ch4['NET'] = "PR"
+        readErr = True
+
     try:
         ch4['STATION'] = config.get('CH4', 'STATION')
     except:
         ch4['STATION'] = "PTSLB"
+        readErr = True
+
     try:
         ch4['LOC'] = config.get('CH4', 'LOC')
     except:
         ch4['LOC'] = "00"
+        readErr = True
+
     try:
         ch4['NAME'] = config.get('CH4', 'NAME')
     except:
         ch4['NAME'] = "CH4"
+        readErr = True
+
     try:
         ch4['TO_DISK'] = int(config.get('CH4', 'TO_DISK'))
     except:
         ch4['TO_DISK'] = 1
+        readErr = True
+
     try:
         ch4['TO_NET'] = int(config.get('CH4', 'TO_NET'))
     except:
         ch4['TO_NET'] = 1
+        readErr = True
+
     try:
         ch4['TO_DISP'] = int(config.get('CH4', 'TO_DISP'))
     except:
         ch4['TO_DISP'] = 1
+        readErr = True
 
     ch5 = {}
     try:
         ch5['NET'] = config.get('CH5', 'NET')
     except:
         ch5['NET'] = "PR"
+        readErr = True
+
     try:
         ch5['STATION'] = config.get('CH5', 'STATION')
     except:
         ch5['STATION'] = "PTSLB"
+        readErr = True
+
     try:
         ch5['LOC'] = config.get('CH5', 'LOC')
     except:
         ch5['LOC'] = "00"
+        readErr = True
+
     try:
         ch5['NAME'] = config.get('CH5', 'NAME')
     except:
         ch5['NAME'] = "CH5"
+        readErr = True
+
     try:
         ch5['TO_DISK'] = int(config.get('CH5', 'TO_DISK'))
     except:
         ch5['TO_DISK'] = 1
+        readErr = True
+
     try:
         ch5['TO_NET'] = int(config.get('CH5', 'TO_NET'))
     except:
         ch5['TO_NET'] = 1
+        readErr = True
+
     try:
         ch5['TO_DISP'] = int(config.get('CH5', 'TO_DISP'))
     except:
         ch5['TO_DISP'] = 1
+        readErr = True
 
     ch6 = {}
     ch6['HAS_SECTION']=config.has_section('CH6')
+    if ch6['HAS_SECTION']:
+        try:
+            ch6['NET'] = config.get('CH6', 'NET')
+        except:
+            ch6['NET'] = "PR"
+            readErr = True
 
-    try:
-        ch6['NET'] = config.get('CH6', 'NET')
-    except:
-        ch6['NET'] = "PR"
-    try:
-        ch6['STATION'] = config.get('CH6', 'STATION')
-    except:
-        ch6['STATION'] = "PTSLB"
-    try:
-        ch6['LOC'] = config.get('CH6', 'LOC')
-    except:
-        ch6['LOC'] = "--"
-    try:
-        ch6['NAME'] = config.get('CH6', 'NAME')
-    except:
-        ch6['NAME'] = "LOG"
-    try:
-        ch6['TO_DISK'] = int(config.get('CH6', 'TO_DISK'))
-    except:
-        ch6['TO_DISK'] = 1
-    try:
-        ch6['TO_NET'] = int(config.get('CH6', 'TO_NET'))
-    except:
-        ch6['TO_NET'] = 1
-    try:
-        ch6['TO_DISP'] = int(config.get('CH6', 'TO_DISP'))
-    except:
-        ch6['TO_DISP'] = 1
+        try:
+            ch6['STATION'] = config.get('CH6', 'STATION')
+        except:
+            ch6['STATION'] = "PTSLB"
+            readErr = True
+
+        try:
+            ch6['LOC'] = config.get('CH6', 'LOC')
+        except:
+            ch6['LOC'] = "--"
+            readErr = True
+
+        try:
+            ch6['NAME'] = config.get('CH6', 'NAME')
+        except:
+            ch6['NAME'] = "LOG"
+            readErr = True
+
+        try:
+            ch6['TO_DISK'] = int(config.get('CH6', 'TO_DISK'))
+        except:
+            ch6['TO_DISK'] = 1
+            readErr = True
+
+        try:
+            ch6['TO_NET'] = int(config.get('CH6', 'TO_NET'))
+        except:
+            ch6['TO_NET'] = 1
+            readErr = True
+
+        try:
+            ch6['TO_DISP'] = int(config.get('CH6', 'TO_DISP'))
+        except:
+            ch6['TO_DISP'] = 1
+            readErr = True
 
     reboot = {}
     try:
         reboot['DAILY_REBOOT'] = int(config.get('REBOOT', 'DAILY_REBOOT'))
     except:
         reboot['DAILY_REBOOT'] = 0
+        readErr = True
+
     try:
         reboot['REBOOT_TIME'] = config.get('REBOOT', 'REBOOT_TIME')
     except:
         reboot['REBOOT_TIME'] = "00:00"
+        readErr = True
 
     return stat, time, net, socket0, socket1, socket2, socket3,ch0,ch1,ch2,ch3,ch4,ch5,ch6,reboot, readErr
 
@@ -459,6 +593,10 @@ def newStation():
                 destination = pth + newName + "/seisview_imp.ini"
                 url = f"http://{newIP}/seisview_imp.ini"
                 urllib.request.urlretrieve(url, destination)
+                stat, time, net, socket0, socket1, socket2, socket3, ch0, ch1, ch2, ch3, ch4, ch5, ch6, reboot, readErr = readini(destination)
+                if readErr:
+                    shutil.rmtree(pth + newName)
+                    return "Sorry! INI file is incorrect."
                 #cmd = f"tftp.exe -i -v {newIP} get seisview_imp.ini"
                 #os.system(cmd)
                 #shutil.move("seisview_imp.ini",f"{pth+newName+'/seisview_imp.ini'}")
@@ -470,6 +608,10 @@ def newStation():
             fileINI = request.files.get('file', None)
             os.mkdir(pth + newName)
             fileINI.save(f"{pth + newName}/seisview_imp.ini")
+            stat, time, net, socket0, socket1, socket2, socket3, ch0, ch1, ch2, ch3, ch4, ch5, ch6, reboot, readErr = readini(f"{pth + newName}/seisview_imp.ini")
+            if readErr:
+                shutil.rmtree(pth + newName)
+                return "Sorry! INI file is incorrect."
             return redirect(f"/{newName}/last")
 
     return render_template('newsta.html',  station=dirlist, statusCodes=statusCodes, chooseSta=chooseSta, hasSta=False)
@@ -686,11 +828,11 @@ def stationProp(station,version):
             shutil.copy2(pth+station+"/seisview_imp.ini", pth+station+"/seisview_imp_v"+str(ver)+".ini")
             with open(pth + station + "/seisview_imp.ini", "w") as file_object:
                 new_inifile.write(file_object)
-            try:
-                client = tftpy.TftpClient(net['ETH_IP'], 69)
-                client.upload('seisview_imp.ini', f"{pth + station + '/seisview_imp.ini'}", timeout=30)
-            except:
-                pass
+            #try:
+            #    client = tftpy.TftpClient(net['ETH_IP'], 69)
+            #    client.upload('seisview_imp.ini', f"{pth + station + '/seisview_imp.ini'}", timeout=30)
+            #except:
+            #    pass
 
             #cmd=f"tftp.exe -i -v {net['ETH_IP']} put {pth+station+'/seisview_imp.ini'}"
             #os.system(cmd)
@@ -711,7 +853,11 @@ def stationProp(station,version):
                 destination = pth + station + "/seisview_imp.ini"
                 url = f"http://{net['ETH_IP']}/seisview_imp.ini"
                 urllib.request.urlretrieve(url, destination)
-
+                stat, time, net, socket0, socket1, socket2, socket3, ch0, ch1, ch2, ch3, ch4, ch5, ch6, reboot, readErr = readini(destination)
+                if readErr:
+                    shutil.copy2(pth + station + "/seisview_imp_v" + str(ver) + ".ini",pth + station + "/seisview_imp.ini")
+                    os.remove(pth + station + "/seisview_imp_v" + str(ver) + ".ini")
+                    return "Sorry! INI file is incorrect."
                 return redirect(f"/{chooseSta}/last")
             except:
                 return "Sorry! The station is off-line."
@@ -733,7 +879,7 @@ for f in tmpl:
         filedata = file.read()
 
     # Replace the target string
-    filedata = filedata.replace('192.168.35.94:5081', config_addr)
+    filedata = filedata.replace('192.168.35.94', config_addr)
 
     # Write the file out again
     with open("templates/"+f, 'w') as file:
