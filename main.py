@@ -592,7 +592,12 @@ def newStation():
                 #client.download('seisview_imp.ini', f"{pth+newName+'/seisview_imp.ini'}", timeout=60)
                 destination = pth + newName + "/seisview_imp.ini"
                 url = f"http://{newIP}/seisview_imp.ini"
-                urllib.request.urlretrieve(url, destination)
+                try:
+                    urllib.request.urlretrieve(url, destination)
+                except:
+                    shutil.rmtree(pth + newName)
+                    return "Sorry! The station is off-line."
+
                 stat, time, net, socket0, socket1, socket2, socket3, ch0, ch1, ch2, ch3, ch4, ch5, ch6, reboot, readErr = readini(destination)
                 if readErr:
                     shutil.rmtree(pth + newName)
@@ -825,22 +830,58 @@ def stationProp(station,version):
         ver=len(flist)
 
         if int(bool(request.form.get("isSend")))==1:
+            countTry = 5
             shutil.copy2(pth+station+"/seisview_imp.ini", pth+station+"/seisview_imp_v"+str(ver)+".ini")
             with open(pth + station + "/seisview_imp.ini", "w") as file_object:
                 new_inifile.write(file_object)
-            #try:
-            #    client = tftpy.TftpClient(net['ETH_IP'], 69)
-            #    client.upload('seisview_imp.ini', f"{pth + station + '/seisview_imp.ini'}", timeout=30)
-            #except:
-            #    pass
+
+            while countTry!=0:
+                with open(pth + station + "/seisview_imp.ini", "w") as file_object:
+                    new_inifile.write(file_object)
+
+                file_size = os.path.getsize(pth + station + "/seisview_imp.ini")
+                emptyCount = 128 - file_size % 128
+                with open(pth + station + "/seisview_imp.ini", "a") as f:
+                    for i in range(emptyCount):
+                        f.write(" ")
+
+                try:
+                    client = tftpy.TftpClient(net['ETH_IP'], 69,options={"blksize":128})
+                    try:
+                        client.upload('seisview_imp.ini', f"{pth + station + '/seisview_imp.ini'}", timeout=30)
+                    except:
+                        pass
+                    destination = pth + station + "/seisview_imp.ini"
+                    url = f"http://{net['ETH_IP']}/seisview_imp.ini"
+                    try:
+                        urllib.request.urlretrieve(url, destination)
+                    except:
+                        pass
+                    stat, time, net, socket0, socket1, socket2, socket3, ch0, ch1, ch2, ch3, ch4, ch5, ch6, reboot, readErr = readini(
+                        destination)
+                    countTry = countTry - 1
+                    if readErr:
+                        if countTry == 0:
+                            with open(pth + station + "/seisview_imp.ini", "w") as file_object:
+                                new_inifile.write(file_object)
+                            with open(pth + station + "/seisview_imp.ini", "r") as file_object:
+                                text1 = file_object.readlines()
+                            with open(pth+station+"/seisview_imp_v"+str(ver)+".ini", "r") as file_object:
+                                text2 = file_object.readlines()
+                            if text1 == text2:
+                                os.remove(pth + station + "/seisview_imp_v" + str(ver) + ".ini")
+                            return "Sorry! INI file is only partially downloaded."
+                    else:
+                        break
+                except:
+                    return "Sorry! INI file is not downloaded. Station is off-line."
 
             #cmd=f"tftp.exe -i -v {net['ETH_IP']} put {pth+station+'/seisview_imp.ini'}"
             #os.system(cmd)
-
             return redirect(f"/{chooseSta}/last")
 
 
-        else:
+        elif int(bool(request.form.get("isGet")))==1:
             #shutil.copy2(pth + station + "/seisview_imp.ini", pth + station + "/seisview_imp_v" + str(ver) + ".ini")
             with open(pth + station + "/seisview_imp_v" + str(ver) + ".ini", "w") as file_object:
                 new_inifile.write(file_object)
