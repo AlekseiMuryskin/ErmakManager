@@ -673,7 +673,17 @@ def stationProp(station,version):
             except:
                 return "Sorry! Refresh page and try again."
 
-
+        elif int(bool(request.form.get("isReset")))==1:
+            addr = f"http://{net['ETH_IP']}/reset"
+            try:
+                r = requests.get(addr, timeout=15)
+                if r.status_code == 200:
+                    return "Reset station is done!"
+                else:
+                    return "Sorry! Station is off-line."
+                return send_file(f"{pth}/{chooseSta}/{fname}", as_attachment=True,  attachment_filename="seisview_imp.ini", mimetype='text/csv')
+            except:
+                return "Sorry! Station is off-line."
 
         pth = "./ini/"
         dirlist = os.listdir(pth)
@@ -835,18 +845,32 @@ def stationProp(station,version):
             with open(pth + station + "/seisview_imp.ini", "w") as file_object:
                 new_inifile.write(file_object)
 
+            with open(pth + station + "/seisview_imp.ini", "r") as file_object:
+                text=file_object.read()
+            text=text.replace(" ","").upper()
+
+            with open(pth + station + "/seisview_imp.ini", "w") as file_object:
+                file_object.write(text)
+
             while countTry!=0:
                 with open(pth + station + "/seisview_imp.ini", "w") as file_object:
                     new_inifile.write(file_object)
+                with open(pth + station + "/seisview_imp.ini", "r") as file_object:
+                    text = file_object.read()
+                text = text.replace(" ", "").upper()
+
+                with open(pth + station + "/seisview_imp.ini", "w") as file_object:
+                    file_object.write(text)
 
                 file_size = os.path.getsize(pth + station + "/seisview_imp.ini")
                 emptyCount = 128 - file_size % 128
                 with open(pth + station + "/seisview_imp.ini", "a") as f:
                     for i in range(emptyCount):
-                        f.write(" ")
+                        f.write("#")
 
                 try:
                     client = tftpy.TftpClient(net['ETH_IP'], 69,options={"blksize":128})
+
                     try:
                         client.upload('seisview_imp.ini', f"{pth + station + '/seisview_imp.ini'}", timeout=30)
                     except:
@@ -857,9 +881,11 @@ def stationProp(station,version):
                         urllib.request.urlretrieve(url, destination)
                     except:
                         pass
-                    stat, time, net, socket0, socket1, socket2, socket3, ch0, ch1, ch2, ch3, ch4, ch5, ch6, reboot, readErr = readini(
-                        destination)
+                    stat, time, net, socket0, socket1, socket2, socket3, ch0, ch1, ch2, ch3, ch4, ch5, ch6, reboot, readErr = readini(destination)
+
                     countTry = countTry - 1
+                    #readErr=False
+
                     if readErr:
                         if countTry == 0:
                             with open(pth + station + "/seisview_imp.ini", "w") as file_object:
@@ -885,6 +911,14 @@ def stationProp(station,version):
             #shutil.copy2(pth + station + "/seisview_imp.ini", pth + station + "/seisview_imp_v" + str(ver) + ".ini")
             with open(pth + station + "/seisview_imp_v" + str(ver) + ".ini", "w") as file_object:
                 new_inifile.write(file_object)
+
+            with open(pth + station + "/seisview_imp.ini", "r") as file_object:
+                text = file_object.read()
+            text = text.replace(" ", "").upper()
+
+            with open(pth + station + "/seisview_imp.ini", "w") as file_object:
+                file_object.write(text)
+
             try:
                 #client = tftpy.TftpClient(net['ETH_IP'], 69)
                 #client.download('seisview_imp.ini', f"{pth + station + '/seisview_imp.ini'}", timeout=30)

@@ -97,14 +97,17 @@
             <button onclick="IsSubmit()" class="btn btn-primary">Send</button>
             <button onclick="IsGetini()" class="btn btn-primary">Get</button>
             <button onclick="IsExport()" class="btn btn-primary">Export</button>
+            <button onclick="IsReset()" class="btn btn-primary">Reset</button>
             <form method="post">
                 <div> 
                     <button id="submit" type="submit" class="btn btn-primary" style="display:none;">Submit</button>
                     <button id="delete" type="submit" class="btn btn-primary" style="display:none;">Delete</button>
                     <input id="isSend" name="isSend" type="checkbox" style="display:none;"/>
+                     <input id="isGet" name="isGet" type="checkbox" style="display:none;"/>
                     <input id="isDelete" name="isDelete" type="checkbox" style="display:none;"/>
                     <input id="isRename" name="isRename" type="checkbox" style="display:none;"/>
                     <input id="isExport" name="isExport" type="checkbox" style="display:none;"/>
+                    <input id="isReset" name="isReset" type="checkbox" style="display:none;"/>
                     <input id="newNameSta" name="newNameSta" type="text" style="display:none;"/>
                 </div>
                 <hr>
@@ -418,9 +421,11 @@
     
     function Rename() {
         document.querySelector("#isSend").checked=false
+        document.querySelector("#isGet").checked=false
         document.querySelector("#isDelete").checked=false
         document.querySelector("#isExport").checked=false
         document.querySelector("#isRename").checked=true
+        document.querySelector("#isReset").checked=false
         let regex = /^[^\s^\x00-\x1f\\?*:"";<>|\/.][^\x00-\x1f\\?*:"";<>|\/]*[^\s^\x00-\x1f\\?*:"";<>|\/.]+$/
         let newName=window.prompt("New Name:")
         if (newName != null) {
@@ -446,9 +451,11 @@
 
     function IsSubmit() {
         document.querySelector("#isSend").checked=true
+        document.querySelector("#isGet").checked=false
         document.querySelector("#isDelete").checked=false
         document.querySelector("#isRename").checked=false
         document.querySelector("#isExport").checked=false
+        document.querySelector("#isReset").checked=false
         if (window.confirm("Do you want save new ini-file?")) {
             console.log("yes")
             $("#submit").click()
@@ -459,9 +466,11 @@
 
     function IsGetini() {
         document.querySelector("#isSend").checked=false
+        document.querySelector("#isGet").checked=true
         document.querySelector("#isDelete").checked=false
         document.querySelector("#isRename").checked=false
         document.querySelector("#isExport").checked=false
+        document.querySelector("#isReset").checked=false
         if (window.confirm("Do you want get current ini-file from station?")) {
             console.log("yes")
             $("#submit").click()
@@ -473,9 +482,11 @@
 
     function IsDelete() {
         document.querySelector("#isSend").checked=false
+        document.querySelector("#isGet").checked=false
         document.querySelector("#isRename").checked=false
         document.querySelector("#isDelete").checked=true
         document.querySelector("#isExport").checked=false
+        document.querySelector("#isReset").checked=false
         if (window.confirm("Do you want delete current station?")) {
             console.log("yes")
             $("#delete").click()
@@ -487,10 +498,28 @@
 
     function IsExport() {
         document.querySelector("#isSend").checked=false
+        document.querySelector("#isGet").checked=false
         document.querySelector("#isRename").checked=false
         document.querySelector("#isDelete").checked=false
         document.querySelector("#isExport").checked=true
+        document.querySelector("#isReset").checked=false
         $("#submit").click()
+        
+    }
+    function IsReset() {
+        document.querySelector("#isSend").checked=false
+        document.querySelector("#isGet").checked=false
+        document.querySelector("#isRename").checked=false
+        document.querySelector("#isDelete").checked=false
+        document.querySelector("#isExport").checked=false
+        document.querySelector("#isReset").checked=true
+        if (window.confirm("Do you want reset current station?")) {
+            console.log("yes")
+            $("#submit").click()
+        
+        } else {
+            console.log("No")
+        }
         
     }
 
