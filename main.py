@@ -11,8 +11,18 @@ from bs4 import BeautifulSoup
 import threading
 from threading import Event
 import time
+import datetime
 
 app=Flask(__name__)
+
+def LogAppend(msg):
+    now = datetime.datetime.now()
+    try:
+        with open("log.txt","a") as f:
+            f.write(f"{now.strftime('%d-%m-%Y %H:%M:%S')} - {msg} \n")
+    except:
+        with open("log.txt","w") as f:
+            f.write(f"{now.strftime('%d-%m-%Y %H:%M:%S')} - {msg} \n")
 
 def ReadDocStatus():
     pth="./ini/"
@@ -54,8 +64,11 @@ def CreateDocStatus(dirlist, isFirst):
                 readErr = True
             if not readErr:
                 try:
+                    LogAppend(f"{sta}: start connect")
                     r = requests.get(f"http://{config.get('NET', 'ETH_IP')}/").status_code == 200
-                except:
+                    LogAppend(f"{sta}: success connect")
+                except Exception as e:
+                    LogAppend(f"{sta}: fail connect! {e}")
                     pass
 
                 if r:
@@ -64,6 +77,7 @@ def CreateDocStatus(dirlist, isFirst):
                     statusCodes[sta] = 0
             else:
                 statusCodes[sta] = 0
+                LogAppend(f"{sta}: ini-file is not correct")
 
         with open("status_sta.txt","w") as f:
             for sta in dirlist:
@@ -1037,6 +1051,8 @@ def CycleCreateDoc():
 pth="./ini/"
 dirlist = os.listdir(pth)
 CreateDocStatus(dirlist,True)
+
+LogAppend("Start app")
 
 p1 = threading.Thread(target=runApp, daemon=True)
 p2 = threading.Thread(target=CycleCreateDoc, daemon=True)
