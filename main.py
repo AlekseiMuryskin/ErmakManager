@@ -66,11 +66,11 @@ def CreateDocStatus(dirlist, isFirst):
                 readErr = True
             if not readErr:
                 try:
-                    LogAppend(f"{sta}: start connect")
+                    #LogAppend(f"{sta}: start connect")
                     r = requests.get(f"http://{config.get('NET', 'ETH_IP')}/").status_code == 200
-                    LogAppend(f"{sta}: success connect")
+                    #LogAppend(f"{sta}: success connect")
                 except Exception as e:
-                    LogAppend(f"{sta}: fail connect! {e}")
+                    #LogAppend(f"{sta}: fail connect! {e}")
                     pass
 
                 if r:
@@ -79,7 +79,7 @@ def CreateDocStatus(dirlist, isFirst):
                     statusCodes[sta] = 0
             else:
                 statusCodes[sta] = 0
-                LogAppend(f"{sta}: ini-file is not correct")
+                #LogAppend(f"{sta}: ini-file is not correct")
 
         with open("status_sta.txt","w") as f:
             for sta in dirlist:
@@ -1045,7 +1045,7 @@ def CycleCreateDoc():
     while True:
         try:
             CreateDocStatus(dirlist, False)
-            time.sleep(300)
+            time.sleep(10)
         except:
             pass
     return
@@ -1054,7 +1054,7 @@ pth="./ini/"
 dirlist = os.listdir(pth)
 CreateDocStatus(dirlist,True)
 
-LogAppend("Start app")
+#LogAppend("Start app")
 
 p1 = threading.Thread(target=runApp, daemon=True)
 p2 = threading.Thread(target=CycleCreateDoc, daemon=True)
