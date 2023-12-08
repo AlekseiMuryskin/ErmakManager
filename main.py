@@ -8,9 +8,67 @@ import requests
 import urllib
 import tftpy
 from bs4 import BeautifulSoup
+import threading
+from threading import Event
+import time
 
 app=Flask(__name__)
 
+def ReadDocStatus():
+    pth="./ini/"
+    dirlist=os.listdir(pth)
+    fname="status_sta.txt"
+    statusCodes = {}
+    with open(fname,'r') as f:
+        data=f.readlines()
+    for line in data:
+        sta=line.strip().split("=")
+        if int(sta[1]) == 1:
+            statusCodes[sta[0]] = "green"
+        else:
+            statusCodes[sta[0]]="red"
+
+    for sta in dirlist:
+        if sta in statusCodes:
+            pass
+        else:
+            statusCodes[sta]="red"
+    return statusCodes
+
+def CreateDocStatus(dirlist, isFirst):
+    pth = "./ini/"
+    statusCodes = {}
+    if isFirst:
+        with open("status_sta.txt","w") as f:
+            for sta in dirlist:
+                f.write(sta+"="+"0"+"\n")
+    else:
+        for sta in dirlist:
+            fname = pth + sta + "/seisview_imp.ini"
+            config = ConfigParser()
+            readErr = False
+            r=False
+            try:
+                config.read(fname)
+            except:
+                readErr = True
+            if not readErr:
+                try:
+                    r = requests.get(f"http://{config.get('NET', 'ETH_IP')}/").status_code == 200
+                except:
+                    pass
+
+                if r:
+                    statusCodes[sta] = 1
+                else:
+                    statusCodes[sta] = 0
+            else:
+                statusCodes[sta] = 0
+
+        with open("status_sta.txt","w") as f:
+            for sta in dirlist:
+                f.write(sta+"="+str(statusCodes[sta])+"\n")
+    return statusCodes
 
 def readini(fname):
     config = ConfigParser()
@@ -552,7 +610,7 @@ def index():
     pth="./ini/"
     dirlist=os.listdir(pth)
     dirlist.sort()
-    statusCodes=getStatusCode(dirlist)
+    statusCodes=ReadDocStatus()
     stat={}
     net = {}
     time = {}
@@ -580,7 +638,7 @@ def newStation():
     pth="./ini/"
     dirlist=os.listdir(pth)
     dirlist.sort()
-    statusCodes=getStatusCode(dirlist)
+    statusCodes=ReadDocStatus()
     chooseSta = ""
     if request.method == "POST":
         if int(bool(request.form.get("isErmak")))==1:
@@ -640,7 +698,7 @@ def stationProp(station,version):
     stat, time, net, socket0, socket1, socket2, socket3, ch0, ch1, ch2, ch3, ch4, ch5, ch6, reboot, readErr = readini(fname)
     chooseSta=station
     chooseVersion = version
-    statusCodes = getStatusCode(dirlist)
+    statusCodes = ReadDocStatus()
     if request.method=="POST":
         if int(bool(request.form.get("isDelete")))==1:
             pth = "./ini/"
@@ -961,4 +1019,30 @@ for f in tmpl:
         file.write(filedata)
 
 
-app.run(host='0.0.0.0', port=5081)
+def runApp():
+    global app
+    app.run(host='0.0.0.0', port=5081)
+
+def CycleCreateDoc():
+    pth = "./ini/"
+    dirlist = os.listdir(pth)
+    while True:
+        try:
+            CreateDocStatus(dirlist, False)
+            time.sleep(300)
+        except:
+            pass
+    return
+
+pth="./ini/"
+dirlist = os.listdir(pth)
+CreateDocStatus(dirlist,True)
+
+p1 = threading.Thread(target=runApp, daemon=True)
+p2 = threading.Thread(target=CycleCreateDoc, daemon=True)
+p1.start()
+p2.start()
+p1.join()
+p2.join()
+
+#app.run(host='0.0.0.0', port=5081)
