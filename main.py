@@ -27,6 +27,7 @@ def LogAppend(msg):
 def ReadDocStatus():
     pth="./ini/"
     dirlist=os.listdir(pth)
+    dirlist.sort()
     fname="status_sta.txt"
     statusCodes = {}
     with open(fname,'r') as f:
@@ -48,6 +49,7 @@ def ReadDocStatus():
 def CreateDocStatus(dirlist, isFirst):
     pth = "./ini/"
     statusCodes = {}
+    dirlist.sort()
     if isFirst:
         with open("status_sta.txt","w") as f:
             for sta in dirlist:
