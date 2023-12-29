@@ -603,16 +603,34 @@
     if ({{reboot['DAILY_REBOOT']}}==1) {
       document.getElementById("dailyrebootInput").checked=true
     }
-     if ({{ch6['TO_DISK']}}==1) {
-      document.getElementById("todisk6Input").checked=true
-    }
-    if ({{ch6['TO_NET']}}==1) {
-      document.getElementById("tonet6Input").checked=true
-    }
-    if ({{ch6['TO_DISP']}}==1) {
-      document.getElementById("todisp6Input").checked=true
-    }
-    
+
+    {% if ch6['TO_DISK']  %}
+        {% if ch6['TO_DISK']==1  %}
+          document.getElementById("todisk6Input").checked=true
+        {% else %}
+          document.getElementById("todisk6Input").checked=false
+        {% endif %}
+    {% endif %}
+
+     {% if ch6['TO_NET']  %}
+        {% if ch6['TO_NET']==1  %}
+          document.getElementById("tonet6Input").checked=true
+        {% else %}
+          document.getElementById("tonet6Input").checked=false
+        {% endif %}
+    {% endif %}
+
+     {% if ch6['TO_DISP']  %}
+        {% if ch6['TO_DISP']==1  %}
+          document.getElementById("todisp6Input").checked=true
+        {% else %}
+          document.getElementById("todisp6Input").checked=false
+        {% endif %}
+    {% endif %}
+
+   
+        
+        
     $('#selectVersion').change(function(){
         window.location.href = $(this).val();
     });
