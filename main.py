@@ -750,7 +750,7 @@ def stationProp(station,version):
 
             try:
                 #return f"{pth}/{chooseSta}/{fname}"
-                return send_file(f"{pth}/{chooseSta}/{fname}", as_attachment=True,  attachment_filename="seisview_imp.ini", mimetype='text/csv')
+                return send_file(f"{pth}/{chooseSta}/{fname}", as_attachment=True,  download_name="seisview_imp.ini", mimetype='text/csv')
             except Exception as e:
                 LogAppend(e)
                 return "Sorry! Refresh page and try again."
@@ -763,7 +763,7 @@ def stationProp(station,version):
                     return "Reset station is done!"
                 else:
                     return "Sorry! Station is off-line."
-                return send_file(f"{pth}/{chooseSta}/{fname}", as_attachment=True,  attachment_filename="seisview_imp.ini", mimetype='text/csv')
+                return send_file(f"{pth}/{chooseSta}/{fname}", as_attachment=True,  download_name="seisview_imp.ini", mimetype='text/csv')
             except:
                 return "Sorry! Station is off-line."
 
