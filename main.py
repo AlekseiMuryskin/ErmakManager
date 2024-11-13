@@ -20,9 +20,11 @@ def LogAppend(msg):
     try:
         with open("log.txt","a") as f:
             f.write(f"{now.strftime('%d-%m-%Y %H:%M:%S')} - {msg} \n")
+            print(f"{now.strftime('%d-%m-%Y %H:%M:%S')} - {msg} \n")
     except:
         with open("log.txt","w") as f:
             f.write(f"{now.strftime('%d-%m-%Y %H:%M:%S')} - {msg} \n")
+            print(f"{now.strftime('%d-%m-%Y %H:%M:%S')} - {msg} \n")
 
 def ReadDocStatus():
     pth="./ini/"
@@ -66,11 +68,11 @@ def CreateDocStatus(dirlist, isFirst):
                 readErr = True
             if not readErr:
                 try:
-                    #LogAppend(f"{sta}: start connect")
+                    LogAppend(f"{sta}: start connect")
                     r = requests.get(f"http://{config.get('NET', 'ETH_IP')}/").status_code == 200
-                    #LogAppend(f"{sta}: success connect")
+                    LogAppend(f"{sta}: success connect")
                 except Exception as e:
-                    #LogAppend(f"{sta}: fail connect! {e}")
+                    LogAppend(f"{sta}: fail connect! {e}")
                     pass
 
                 if r:
@@ -79,7 +81,7 @@ def CreateDocStatus(dirlist, isFirst):
                     statusCodes[sta] = 0
             else:
                 statusCodes[sta] = 0
-                #LogAppend(f"{sta}: ini-file is not correct")
+                LogAppend(f"{sta}: ini-file is not correct")
 
         with open("status_sta.txt","w") as f:
             for sta in dirlist:
@@ -218,11 +220,11 @@ def readini(fname):
         socket0['PORT'] = config.get('SOCKET0', 'PORT')
     except:
         socket0['PORT'] = "80"
-        readErr = True
-
     socket1 = {}
     try:
         socket1['SERVICE'] = config.get('SOCKET1', 'SERVICE')
+        readErr = True
+
         if (socket1['SERVICE'] == ""):
             socket1['SERVICE'] = "0"
     except:
@@ -593,10 +595,12 @@ def readini(fname):
 
 def getYearFirmware(ip):
     #print(f"http://{ip}/status")
+    LogAppend(f"http://{ip}/status")
     r = requests.get(f"http://{ip}/status", timeout=15)
     soup = BeautifulSoup(r.text, "html.parser")
     item = soup.find('td', text='Firmware').find_next_sibling("td")
     item = int(str(item).split(" ")[1].split("-")[0])
+    LogAppend(f"bs4 res:{item}")
     return item
 
 
@@ -672,10 +676,12 @@ def newStation():
                     shutil.rmtree(pth + newName)
                     return "Sorry! The station is off-line."
 
+
                 stat, time, net, socket0, socket1, socket2, socket3, ch0, ch1, ch2, ch3, ch4, ch5, ch6, reboot, readErr = readini(destination)
-                if readErr:
-                    shutil.rmtree(pth + newName)
-                    return "Sorry! INI file is incorrect."
+                #if readErr:
+                #    shutil.rmtree(pth + newName)
+                #    return "Sorry! INI file is incorrect."
+
                 #cmd = f"tftp.exe -i -v {newIP} get seisview_imp.ini"
                 #os.system(cmd)
                 #shutil.move("seisview_imp.ini",f"{pth+newName+'/seisview_imp.ini'}")
@@ -729,7 +735,8 @@ def stationProp(station,version):
             try:
                 shutil.move(f"{pth}/{chooseSta}",f"{pth}/{newName}")
                 return redirect(f"/{newName}/last")
-            except:
+            except Exception as e:
+                LogAppend(f"Rename error: {e}")
                 return "Sorry! New name station is incorrect."
 
         elif int(bool(request.form.get("isExport")))==1:
@@ -744,7 +751,8 @@ def stationProp(station,version):
             try:
                 #return f"{pth}/{chooseSta}/{fname}"
                 return send_file(f"{pth}/{chooseSta}/{fname}", as_attachment=True,  attachment_filename="seisview_imp.ini", mimetype='text/csv')
-            except:
+            except Exception as e:
+                LogAppend(e)
                 return "Sorry! Refresh page and try again."
 
         elif int(bool(request.form.get("isReset")))==1:
@@ -899,10 +907,13 @@ def stationProp(station,version):
         new_inifile['CH4'] = ch4
         new_inifile['CH5'] = ch5
         try:
-            if (getYearFirmware(net['ETH_IP'])>2022):
-                #print("It is new firmware")
+            yearFirm = int(getYearFirmware(net['ETH_IP']))
+            LogAppend(f"year firm: {yearFirm}")
+            if yearFirm>2022:
+                LogAppend(f"ch6: {ch6}")
                 new_inifile['CH6'] = ch6
-        except:
+        except Exception as e:
+            LogAppend(f"Except with year firmware: {e}")
             return "Oops! Refresh and try again."
         new_inifile['TIME']=time
         new_inifile['NET']=net
@@ -982,6 +993,7 @@ def stationProp(station,version):
 
 
         elif int(bool(request.form.get("isGet")))==1:
+            LogAppend("start get")
             #shutil.copy2(pth + station + "/seisview_imp.ini", pth + station + "/seisview_imp_v" + str(ver) + ".ini")
             with open(pth + station + "/seisview_imp_v" + str(ver) + ".ini", "w") as file_object:
                 new_inifile.write(file_object)
@@ -1003,10 +1015,10 @@ def stationProp(station,version):
                 url = f"http://{net['ETH_IP']}/seisview_imp.ini"
                 urllib.request.urlretrieve(url, destination)
                 stat, time, net, socket0, socket1, socket2, socket3, ch0, ch1, ch2, ch3, ch4, ch5, ch6, reboot, readErr = readini(destination)
-                if readErr:
-                    shutil.copy2(pth + station + "/seisview_imp_v" + str(ver) + ".ini",pth + station + "/seisview_imp.ini")
-                    os.remove(pth + station + "/seisview_imp_v" + str(ver) + ".ini")
-                    return "Sorry! INI file is incorrect."
+                #if readErr:
+                    #shutil.copy2(pth + station + "/seisview_imp_v" + str(ver) + ".ini",pth + station + "/seisview_imp.ini")
+                    #os.remove(pth + station + "/seisview_imp_v" + str(ver) + ".ini")
+                    #return "Sorry! INI file is incorrect."
                 return redirect(f"/{chooseSta}/last")
             except:
                 return "Sorry! The station is off-line."
@@ -1054,7 +1066,7 @@ pth="./ini/"
 dirlist = os.listdir(pth)
 CreateDocStatus(dirlist,True)
 
-#LogAppend("Start app")
+LogAppend("Start app")
 
 p1 = threading.Thread(target=runApp, daemon=True)
 p2 = threading.Thread(target=CycleCreateDoc, daemon=True)
